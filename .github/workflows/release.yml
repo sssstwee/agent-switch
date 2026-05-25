@@ -1,0 +1,123 @@
+name: release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            args: "--target aarch64-apple-darwin --bundles dmg"
+          - platform: macos-latest
+            args: "--target x86_64-apple-darwin --bundles dmg"
+          - platform: windows-latest
+            args: "--bundles nsis"
+          - platform: ubuntu-22.04
+            args: "--bundles appimage"
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - name: checkout private core
+        uses: actions/checkout@v6.0.2
+        with:
+          repository: sssstwee/agent-switch-private-core
+          token: ${{ secrets.AGENT_SWITCH_PRIVATE_CORE_TOKEN }}
+          path: .private/agent-switch-private-core
+
+      - name: setup pnpm
+        uses: pnpm/action-setup@v6.0.8
+        with:
+          version: 10
+
+      - name: setup node
+        uses: actions/setup-node@v6.4.0
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: install rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: install linux dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libssl-dev \
+            libgtk-3-dev \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf
+
+      - name: rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+          shared-key: ${{ runner.os }}-${{ matrix.args }}
+
+      - name: install frontend dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: verify frontend tests
+        run: pnpm test
+
+      - name: verify frontend build
+        run: pnpm build
+
+      - name: verify rust tests
+        run: cargo test --manifest-path src-tauri/Cargo.toml
+
+      - name: verify rust clippy
+        run: cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
+
+      - name: verify rust formatting
+        run: cargo fmt --manifest-path src-tauri/Cargo.toml -- --check
+
+      - name: prepare release notes
+        id: release_notes
+        shell: bash
+        run: |
+          notes="$(awk -v tag="${GITHUB_REF_NAME}" '
+            $0 ~ "^## " tag " " { printing = 1; next }
+            printing && /^## v/ { exit }
+            printing { print }
+          ' CHANGELOG.md)"
+          {
+            echo "body<<EOF"
+            echo "$notes"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: "Switch++ ${{ github.ref_name }}"
+          releaseBody: ${{ steps.release_notes.outputs.body }}
+          releaseDraft: false
+          prerelease: false
+          args: ${{ matrix.args }}

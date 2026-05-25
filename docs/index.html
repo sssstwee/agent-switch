@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Switch++ 下载与使用指南</title>
+    <meta
+      name="description"
+      content="Switch++ is a Claude Code, Claude Desktop, Codex CLI, Codex Desktop, Hermes, OpenCode, OpenClaw, Pi, and AI coding agent third-party config switcher, model router, and local OpenAI/Anthropic compatibility gateway."
+    />
+    <meta
+      name="keywords"
+      content="Switch++, Agent Router, model router, model switcher, LLM gateway, Claude Code third-party models, Claude Desktop, Codex third-party models, Codex CLI, Codex Desktop, Hermes, Hermes Agent, OpenCode, OpenClaw, Pi, Pi Coding Agent, Oh My OpenAgent, Oh My OpenCode, Oh My Pi, OpenAI, OpenAI API, Anthropic, Anthropic API, third-party config switcher, third-party config manager, AI coding agent, local compatibility gateway, OpenAI API proxy, Anthropic API proxy, OpenAI compatible, Anthropic compatible"
+    />
+    <link rel="icon" href="data:," />
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #ffffff;
+        --surface: #ffffff;
+        --surface-soft: #f5f5f5;
+        --line: #cccccc;
+        --ink: #000000;
+        --ink-muted: #555555;
+        --accent: #000000;
+        --accent-fg: #ffffff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font: 15px/1.7 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      code {
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        background: var(--surface-soft);
+        padding: 1px 5px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.92em;
+      }
+
+      pre {
+        margin: 12px 0 0;
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface-soft);
+        padding: 12px;
+      }
+
+      pre code {
+        border: 0;
+        background: transparent;
+        padding: 0;
+      }
+
+      .page {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 36px 20px 56px;
+      }
+
+      .topbar {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 20px;
+      }
+
+      .hero {
+        display: grid;
+        gap: 18px;
+        padding: 12px 0 32px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .eyebrow {
+        color: var(--ink-muted);
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(34px, 6vw, 60px);
+        line-height: 1.05;
+        letter-spacing: 0;
+      }
+
+      h2 {
+        margin: 0 0 12px;
+        font-size: 24px;
+        line-height: 1.3;
+        letter-spacing: 0;
+      }
+
+      h3 {
+        margin: 22px 0 8px;
+        font-size: 17px;
+      }
+
+      p {
+        margin: 0 0 12px;
+      }
+
+      .lead {
+        max-width: 820px;
+        color: var(--ink-muted);
+        font-size: 18px;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .btn {
+        min-height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #000000;
+        border-radius: 8px;
+        padding: 0 16px;
+        background: #ffffff;
+        color: #000000;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .btn.primary {
+        background: #000000;
+        color: #ffffff;
+      }
+
+      section {
+        padding: 28px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      ul,
+      ol {
+        margin: 0;
+        padding-left: 22px;
+      }
+
+      li + li {
+        margin-top: 6px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+
+      th,
+      td {
+        border-bottom: 1px solid var(--line);
+        padding: 10px 12px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: var(--surface-soft);
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .screenshot-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .screenshot-card {
+        margin: 0;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+
+      .screenshot-card.featured {
+        grid-column: 1 / -1;
+      }
+
+      .screenshot-card img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .screenshot-card figcaption {
+        border-top: 1px solid var(--line);
+        padding: 8px 10px;
+        color: var(--ink-muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .lang-block,
+      .lang-inline,
+      .lang-row {
+        display: none;
+      }
+
+      html[data-lang="zh"] .lang-block[data-lang="zh"],
+      html[data-lang="en"] .lang-block[data-lang="en"] {
+        display: block;
+      }
+
+      html[data-lang="zh"] .lang-inline[data-lang="zh"],
+      html[data-lang="en"] .lang-inline[data-lang="en"] {
+        display: inline;
+      }
+
+      html[data-lang="zh"] .lang-row[data-lang="zh"],
+      html[data-lang="en"] .lang-row[data-lang="en"] {
+        display: table-row;
+      }
+
+      @media (max-width: 700px) {
+        .page {
+          padding-top: 24px;
+        }
+
+        table {
+          display: block;
+          overflow-x: auto;
+        }
+
+        .screenshot-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <div class="topbar">
+        <button class="btn" id="lang-toggle" type="button" aria-pressed="false" aria-label="Switch language to English">English</button>
+      </div>
+
+      <header class="hero">
+        <div class="lang-block" data-lang="zh">
+          <div class="eyebrow">Switch++ 下载与使用指南</div>
+          <h1>Switch++</h1>
+          <p class="lead">
+            面向 Claude Code、Claude Desktop、Codex CLI、Codex Desktop、Hermes、OpenCode、OpenClaw、Pi 生态和其他 AI 编程 Agent 的三方接入配置切换工具、模型路由器和本地兼容网关。
+          </p>
+        </div>
+        <div class="lang-block" data-lang="en">
+          <div class="eyebrow">Switch++ Download and User Guide</div>
+          <h1>Switch++</h1>
+          <p class="lead">
+            Third-party config switcher, model router, and local compatibility gateway for Claude Code, Claude Desktop, Codex CLI, Codex Desktop, Hermes, OpenCode, OpenClaw, Pi-family, and other AI coding agents.
+          </p>
+        </div>
+        <div class="actions">
+          <a class="btn primary" href="https://github.com/sssstwee/switch-plus-plus/releases/latest">
+            <span class="lang-inline" data-lang="zh">下载最新版</span>
+            <span class="lang-inline" data-lang="en">Download latest release</span>
+          </a>
+          <a class="btn" href="https://github.com/sssstwee/switch-plus-plus/releases">
+            <span class="lang-inline" data-lang="zh">查看所有版本</span>
+            <span class="lang-inline" data-lang="en">All releases</span>
+          </a>
+        </div>
+      </header>
+
+      <section>
+        <h2>
+          <span class="lang-inline" data-lang="zh">功能亮点</span>
+          <span class="lang-inline" data-lang="en">Highlights</span>
+        </h2>
+        <ul class="lang-block" data-lang="zh">
+          <li>让第三方模型更容易进入 Claude、Codex 以及常用本地 AI 编程工具。</li>
+          <li>支持 DeepSeek、MiniMax、Kimi、GLM 等国产模型接入 Codex 客户端及 Claude 客户端。</li>
+          <li>支持国产模型接入 Codex 后配合使用官方插件和移动端能力；需先登录官方账号并添加官方配置，再与三方模型配置搭配使用。</li>
+          <li>在官方账号模式和第三方模型厂商模式之间快速切换。</li>
+          <li>为不同工具保存多套配置，并支持新增、编辑、复制、删除、排序和一键应用。</li>
+          <li>写入前预览配置内容，并在应用前自动保留备份，便于回退。</li>
+          <li>内置主流厂商预设、模型发现、能力提示和配置建议，减少手动试错。</li>
+          <li>提供本地兼容网关，统一承接 Claude 与 Codex 的第三方模型调用。</li>
+          <li>展示网关状态、调用记录、消耗统计、错误记录和趋势图表，方便定位问题。</li>
+          <li>检查本机工具、应用、配置文件、安装版本和可升级状态。</li>
+          <li>支持一键安装、升级、卸载常用 CLI 工具。</li>
+          <li>支持中英双语界面、紧凑侧边栏、系统托盘和桌面原生窗口体验。</li>
+        </ul>
+        <ul class="lang-block" data-lang="en">
+          <li>Bring third-party models into Claude, Codex, and common local AI coding tools.</li>
+          <li>Connect domestic model providers such as DeepSeek, MiniMax, Kimi, and GLM to Codex and Claude clients.</li>
+          <li>Use official Codex plugins and mobile features alongside domestic model profiles after signing in with an official account and adding the official configuration.</li>
+          <li>Switch quickly between official-account mode and third-party provider mode.</li>
+          <li>Save multiple profiles per tool, then add, edit, duplicate, delete, reorder, and apply them quickly.</li>
+          <li>Preview local configuration before writing it, with backups created before changes are applied.</li>
+          <li>Use built-in provider presets, model discovery, capability notes, and recommendations to reduce trial and error.</li>
+          <li>Route Claude and Codex third-party model calls through the local compatibility gateway.</li>
+          <li>Inspect gateway status, request history, usage statistics, recent errors, and trend charts.</li>
+          <li>Check local tools, apps, config files, installed versions, and available upgrades.</li>
+          <li>Install, upgrade, and uninstall common CLI tools from the app.</li>
+          <li>Use the bilingual desktop interface with compact navigation, tray support, and native window behavior.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>
+          <span class="lang-inline" data-lang="zh">界面预览</span>
+          <span class="lang-inline" data-lang="en">Screenshots</span>
+        </h2>
+        <div class="lang-block" data-lang="zh">
+          <div class="screenshot-grid">
+            <figure class="screenshot-card featured">
+              <img src="assets/screenshots/switchpp-codex-desktop-deepseek.png" alt="Codex Desktop 使用 DeepSeek 三方模型" loading="lazy" />
+              <figcaption>Codex Desktop 使用 DeepSeek 三方模型</figcaption>
+            </figure>
+            <figure class="screenshot-card">
+              <img src="assets/screenshots/switchpp-codex-profiles.png" alt="Codex 配置列表" loading="lazy" />
+              <figcaption>Codex 配置列表</figcaption>
+            </figure>
+            <figure class="screenshot-card">
+              <img src="assets/screenshots/switchpp-codex-new-profile.png" alt="新增 Codex 配置" loading="lazy" />
+              <figcaption>新增 Codex 配置</figcaption>
+            </figure>
+            <figure class="screenshot-card">
+              <img src="assets/screenshots/switchpp-claude-desktop-profiles.png" alt="Claude Desktop 配置切换" loading="lazy" />
+              <figcaption>Claude Desktop 配置切换</figcaption>
+            </figure>
+            <figure class="screenshot-card">
+              <img src="assets/screenshots/switchpp-environment-check.png" alt="本地环境检查" loading="lazy" />
+              <figcaption>本地环境检查</figcaption>
+            </figure>
+            <figure class="screenshot-card">
+              <img src="assets/screenshots/switchpp-gateway-overview.png" alt="兼容网关概览" loading="lazy" />
+              <figcaption>兼容网关概览</figcaption>
+            </figure>
+            <figure class="screenshot-card">
+              <img src="assets/screenshots/switchpp-gateway-requests.png" alt="兼容网关调用记录" loading="lazy" />
+              <figcaption>兼容网关调用记录</figcaption>
+            </figure>
+            <figure class="screenshot-card">
+              <img src="assets/screenshots/switchpp-claude-model-menu.png" alt="Claude Desktop 模型菜单" loading="lazy" />
+              <figcaption>Claude Desktop 模型菜单</figcaption>
+            </figure>
+            <figure class="screenshot-card">
+              <img src="assets/screenshots/switchpp-claude-gateway-chat.png" alt="Claude Desktop 经由本地网关响应" loading="lazy" />
+              <figcaption>Claude Desktop 经由本地网关响应</figcaption>
+            </figure>
+          </div>
+        </div>
+        <div class="lang-block" data-lang="en">
+          <div class="screenshot-grid">
+            <figure class="screenshot-card featured">
+              <img src="assets/screenshots/switchpp-codex-desktop-deepseek.png" alt="Codex Desktop with a DeepSeek third-party model" loading="lazy" />
+              <figcaption>Codex Desktop with a DeepSeek third-party model</figcaption>
+            </figure>
+            <figure class="screenshot-card">
+              <img src="assets/screenshots/switchpp-codex-profiles.png" alt="Codex profiles" loading="lazy" />
+              <figcaption>Codex profiles</figcaption>
+            </figure>
+            <figure class="screenshot-card">
+              <img src="assets/screenshots/switchpp-codex-new-profile.png" alt="New Codex profile" loading="lazy" />
+              <figcaption>New Codex profile</figcaption>
+            </figure>
+            <figure class="screenshot-card">
+              <img src="assets/screenshots/switchpp-claude-desktop-profiles.png" alt="Claude Desktop profiles" loading="lazy" />
+              <figcaption>Claude Desktop profiles</figcaption>
+            </figure>
+            <figure class="screenshot-card">
+              <img src="assets/screenshots/switchpp-environment-check.png" alt="Environment check" loading="lazy" />
+              <figcaption>Environment check</figcaption>
+            </figure>
+            <figure class="screenshot-card">
+              <img src="assets/screenshots/switchpp-gateway-overview.png" alt="Gateway overview" loading="lazy" />
+              <figcaption>Gateway overview</figcaption>
+            </figure>
+            <figure class="screenshot-card">
+              <img src="assets/screenshots/switchpp-gateway-requests.png" alt="Gateway request history" loading="lazy" />
+              <figcaption>Gateway request history</figcaption>
+            </figure>
+            <figure class="screenshot-card">
+              <img src="assets/screenshots/switchpp-claude-model-menu.png" alt="Claude Desktop model menu" loading="lazy" />
+              <figcaption>Claude Desktop model menu</figcaption>
+            </figure>
+            <figure class="screenshot-card">
+              <img src="assets/screenshots/switchpp-claude-gateway-chat.png" alt="Claude Desktop through local gateway" loading="lazy" />
+              <figcaption>Claude Desktop through local gateway</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>
+          <span class="lang-inline" data-lang="zh">适用场景</span>
+          <span class="lang-inline" data-lang="en">Use Cases</span>
+        </h2>
+        <ul class="lang-block" data-lang="zh">
+          <li>在一个桌面应用里管理 Claude Code、Claude Desktop、Codex、Codex Desktop、OpenCode、Pi 生态配置。</li>
+          <li>在官方账号模式和第三方模型厂商模式之间切换。</li>
+          <li>覆盖 Claude Code 第三方网关、Codex Desktop、本地 Codex third-party provider、OpenAI-compatible 和 Anthropic-compatible 端点。</li>
+          <li>通过本地兼容网关查看实时调用记录、token 统计和缓存命中统计。</li>
+          <li>写回本地配置前检查配置内容，并优先创建备份。</li>
+        </ul>
+        <ul class="lang-block" data-lang="en">
+          <li>Manage Claude Code, Claude Desktop, Codex, Codex Desktop, OpenCode, and Pi-family configuration in one desktop app.</li>
+          <li>Switch between official-account mode and third-party model provider mode.</li>
+          <li>Cover Claude Code third-party gateways, Codex Desktop, local Codex third-party providers, OpenAI-compatible endpoints, and Anthropic-compatible endpoints.</li>
+          <li>Inspect local compatibility gateway calls, token totals, and cache-hit statistics.</li>
+          <li>Review generated local configuration before writing it, with backups created first.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>
+          <span class="lang-inline" data-lang="zh">支持的目标应用</span>
+          <span class="lang-inline" data-lang="en">Supported Target Apps</span>
+        </h2>
+        <table>
+          <thead>
+            <tr class="lang-row" data-lang="zh">
+              <th>目标应用</th>
+              <th>Switch++ 管理内容</th>
+              <th>主要配置位置</th>
+            </tr>
+            <tr class="lang-row" data-lang="en">
+              <th>Target app</th>
+              <th>What Switch++ manages</th>
+              <th>Main config location</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Claude Code</td>
+              <td>
+                <span class="lang-inline" data-lang="zh">CLI settings、模型映射、网关环境变量、功能开关</span>
+                <span class="lang-inline" data-lang="en">CLI settings, model mapping, gateway environment variables, feature flags</span>
+              </td>
+              <td><code>~/.claude/settings.json</code></td>
+            </tr>
+            <tr>
+              <td>Claude Desktop</td>
+              <td>
+                <span class="lang-inline" data-lang="zh">桌面端第三方配置库</span>
+                <span class="lang-inline" data-lang="en">Desktop third-party config library</span>
+              </td>
+              <td>macOS: <code>~/Library/Application Support/Claude-3p/configLibrary</code><br />Windows: <code>%APPDATA%\Claude-3p\configLibrary</code></td>
+            </tr>
+            <tr>
+              <td>Codex</td>
+              <td>
+                <span class="lang-inline" data-lang="zh">官方登录配置和第三方厂商配置</span>
+                <span class="lang-inline" data-lang="en">Official login config and third-party provider config</span>
+              </td>
+              <td><code>~/.codex/auth.json</code>, <code>~/.codex/config.toml</code></td>
+            </tr>
+            <tr>
+              <td>OpenCode</td>
+              <td>
+                <span class="lang-inline" data-lang="zh">OpenAI-compatible provider、默认模型、small model</span>
+                <span class="lang-inline" data-lang="en">OpenAI-compatible provider, default model, small model</span>
+              </td>
+              <td><code>~/.config/opencode/opencode.json</code></td>
+            </tr>
+            <tr>
+              <td>Oh My OpenAgent</td>
+              <td>
+                <span class="lang-inline" data-lang="zh">agents/categories 模型路由，并同步 OpenCode provider</span>
+                <span class="lang-inline" data-lang="en">agents/categories model routing, with synced OpenCode provider config</span>
+              </td>
+              <td><code>~/.config/opencode/oh-my-openagent.json</code></td>
+            </tr>
+            <tr>
+              <td>OpenClaw</td>
+              <td>
+                <span class="lang-inline" data-lang="zh">provider 与默认 agent 模型</span>
+                <span class="lang-inline" data-lang="en">provider and default agent model</span>
+              </td>
+              <td><code>~/.openclaw/openclaw.json</code></td>
+            </tr>
+            <tr>
+              <td>Hermes Agent</td>
+              <td>
+                <span class="lang-inline" data-lang="zh">custom provider 与默认模型</span>
+                <span class="lang-inline" data-lang="en">custom provider and default model</span>
+              </td>
+              <td><code>~/.hermes/config.yaml</code></td>
+            </tr>
+            <tr>
+              <td>Pi</td>
+              <td>
+                <span class="lang-inline" data-lang="zh">custom provider、默认 provider 与默认模型</span>
+                <span class="lang-inline" data-lang="en">custom provider, default provider, and default model</span>
+              </td>
+              <td><code>~/.pi/agent/models.json</code>, <code>~/.pi/agent/settings.json</code></td>
+            </tr>
+            <tr>
+              <td>Oh My Pi</td>
+              <td>
+                <span class="lang-inline" data-lang="zh">provider 与 agent/category 模型路由</span>
+                <span class="lang-inline" data-lang="en">provider and agent/category model routing</span>
+              </td>
+              <td><code>~/.omp/agent/models.yml</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <div class="lang-block" data-lang="zh">
+          <h2>下载与安装</h2>
+          <p>打开发布页，按系统选择安装包：</p>
+          <ul>
+            <li>macOS Apple Silicon：<code>aarch64.dmg</code></li>
+            <li>macOS Intel：<code>x64.dmg</code></li>
+            <li>Windows x64：<code>x64-setup.exe</code></li>
+            <li>Linux x64：<code>amd64.AppImage</code></li>
+          </ul>
+          <h3>macOS 首次启动授权</h3>
+          <p>如果 macOS 提示 Switch++ 不是来自 App Store 或无法验证开发者，先确认系统允许打开非 App Store 应用：</p>
+          <ol>
+            <li>打开「系统设置」。</li>
+            <li>进入「隐私与安全性」。</li>
+            <li>找到「安全性」。</li>
+            <li>在「允许以下来源的应用程序」里选择「任何来源」。</li>
+          </ol>
+          <p>如果没有看到「任何来源」，可以在终端执行下面的命令启用该选项：</p>
+          <pre><code>sudo spctl --master-disable</code></pre>
+          <p>然后回到「系统设置」>「隐私与安全性」>「安全性」，确认「任何来源」已经可选并已启用。</p>
+          <p>首次安装后，macOS 还可能因为下载文件带有 quarantine 标记而阻止启动。确认安装包来自本仓库发布页后，执行：</p>
+          <pre><code>sudo xattr -rd com.apple.quarantine "/Applications/Switch++.app"
+open "/Applications/Switch++.app"</code></pre>
+          <p>如果仍然提示无法打开，请再回到「隐私与安全性」页面，在 Switch++ 提示项旁点击「仍要打开」，然后重新启动应用。</p>
+          <p>Switch++ 可以正常打开后，如需恢复 macOS 默认安全设置，可执行：</p>
+          <pre><code>sudo spctl --master-enable</code></pre>
+        </div>
+        <div class="lang-block" data-lang="en">
+          <h2>Download and Install</h2>
+          <p>Open the release page and choose the installer for your system:</p>
+          <ul>
+            <li>macOS Apple Silicon: <code>aarch64.dmg</code></li>
+            <li>macOS Intel: <code>x64.dmg</code></li>
+            <li>Windows x64: <code>x64-setup.exe</code></li>
+            <li>Linux x64: <code>amd64.AppImage</code></li>
+          </ul>
+          <h3>macOS First Launch Authorization</h3>
+          <p>If macOS says Switch++ is not from the App Store or cannot verify the developer, first confirm that macOS allows apps from outside the App Store:</p>
+          <ol>
+            <li>Open System Settings.</li>
+            <li>Go to Privacy & Security.</li>
+            <li>Find Security.</li>
+            <li>Under Allow applications downloaded from, select Anywhere.</li>
+          </ol>
+          <p>If Anywhere is not visible, run this command in Terminal to enable it:</p>
+          <pre><code>sudo spctl --master-disable</code></pre>
+          <p>Then return to System Settings > Privacy & Security > Security, and confirm that Anywhere is available and selected.</p>
+          <p>After first install, macOS may still block launch because the downloaded app has a quarantine flag. If you have confirmed the installer came from this repository's release page, run:</p>
+          <pre><code>sudo xattr -rd com.apple.quarantine "/Applications/Switch++.app"
+open "/Applications/Switch++.app"</code></pre>
+          <p>If macOS still blocks the app, return to Privacy & Security, click Open Anyway next to the Switch++ warning, and launch the app again.</p>
+          <p>After Switch++ opens normally, you can restore the default macOS security setting with:</p>
+          <pre><code>sudo spctl --master-enable</code></pre>
+        </div>
+      </section>
+
+      <section>
+        <div class="lang-block" data-lang="zh">
+          <h2>版权与许可</h2>
+          <p>Copyright (c) 2026 sssstwee.</p>
+          <p>本项目采用自定义的 Switch++ Proprietary Non-Commercial Source License 1.0。这不是 OSI 定义的开源协议；源码仅允许个人、教育、研究或评估用途查看、运行和修改。未经书面许可，严格禁止商业使用、企业内部使用、SaaS/托管服务、付费交付、商业项目集成、发布修改版或衍生版本，以及用于机器学习训练、数据集、评测或自动化开发工具。</p>
+          <p>完整条款见仓库根目录 <code>LICENSE</code> 文件。</p>
+        </div>
+        <div class="lang-block" data-lang="en">
+          <h2>Copyright and License</h2>
+          <p>Copyright (c) 2026 sssstwee.</p>
+          <p>This project is licensed under the custom Switch++ Proprietary Non-Commercial Source License 1.0. This is not an OSI open-source license. The source code may be viewed, run, and modified only for personal, educational, research, or evaluation purposes. Without prior written permission, commercial use, internal company use, SaaS or hosted service use, paid delivery, commercial project integration, publication of modified or derivative versions, and use for machine learning training, datasets, evaluation, or automated development tools are strictly prohibited.</p>
+          <p>See the repository <code>LICENSE</code> file for the full terms.</p>
+        </div>
+      </section>
+    </main>
+    <script>
+      const root = document.documentElement;
+      const toggle = document.getElementById("lang-toggle");
+      const storageKey = "switchpp-guide-lang";
+
+      function setLanguage(lang) {
+        const next = lang === "en" ? "en" : "zh";
+        root.dataset.lang = next;
+        root.lang = next === "en" ? "en" : "zh-CN";
+        toggle.textContent = next === "en" ? "中文" : "English";
+        toggle.setAttribute("aria-pressed", next === "en" ? "true" : "false");
+        toggle.setAttribute("aria-label", next === "en" ? "切换语言为中文" : "Switch language to English");
+        localStorage.setItem(storageKey, next);
+      }
+
+      setLanguage(localStorage.getItem(storageKey) || "zh");
+      toggle.addEventListener("click", () => {
+        setLanguage(root.dataset.lang === "zh" ? "en" : "zh");
+      });
+    </script>
+  </body>
+</html>

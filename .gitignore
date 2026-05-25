@@ -1,0 +1,52 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Tool configs & reference
+.claude/
+.codex/
+.cursor/
+.opencode/
+.playwright-mcp/
+reference/
+.private/
+
+# AI tool runtime state
+.omo/
+
+# Internal planning, drafts & design docs
+docs/dev/
+docs/drafts/
+docs/internal/
+docs/notes/
+docs/planning/
+docs/private/
+docs/superpowers/
+*.internal.md
+*.private.md
+*.notes.md
+
+# Build artifacts & generated files
+src-tauri/target/
+src-tauri/gen/

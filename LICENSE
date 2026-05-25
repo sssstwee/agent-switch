@@ -1,0 +1,84 @@
+Switch++ Proprietary Non-Commercial Source License 1.0
+
+Copyright (c) 2026 sssstwee. All rights reserved.
+
+This is a custom source-available license. It is not an open-source license as
+defined by the Open Source Initiative, because commercial use is prohibited.
+
+1. Limited permission
+
+Subject to this license, you may view, copy, run, and modify the software and
+source code only for personal, educational, research, or evaluation purposes.
+
+2. No commercial use
+
+Commercial use is strictly prohibited without prior written permission from the
+copyright holder.
+
+Commercial use includes, but is not limited to:
+
+- selling, licensing, sublicensing, renting, or monetizing the software or any
+  modified version;
+- using the software in, with, or as part of any paid product, paid service,
+  SaaS, hosted service, managed service, integration, appliance, or platform;
+- providing paid consulting, implementation, customization, hosting, support,
+  training, operations, or other professional services based on the software;
+- using the software inside or for the benefit of a for-profit company,
+  commercial organization, commercial project, client project, or revenue
+  generating activity;
+- using the software to reduce commercial operating costs, support internal
+  business workflows, or gain commercial advantage;
+- using the software for advertising, marketing, lead generation, customer
+  acquisition, analytics, benchmarking, competitive analysis, or product
+  development in a commercial context.
+
+3. Redistribution restrictions
+
+You may redistribute unmodified copies of the software only for non-commercial
+purposes, and only if this license and all copyright notices are included.
+
+You may not publish, distribute, sublicense, sell, host, or otherwise provide
+modified versions, forks, derivatives, compiled binaries, installers, or
+packaged versions to any third party without prior written permission from the
+copyright holder.
+
+4. No hosted or network service use
+
+You may not make the software or any modified version available as a hosted
+service, network service, API, remote tool, managed service, or embedded
+component of another service without prior written permission.
+
+5. No machine learning or dataset use
+
+You may not use the software, source code, documentation, issues, discussions,
+or project assets to train, fine-tune, evaluate, benchmark, or build machine
+learning models, datasets, embeddings, code generation systems, or automated
+software development tools without prior written permission.
+
+6. No trademark rights
+
+This license does not grant rights to use the project name, logos, branding, or
+the copyright holder's trademarks except as necessary to identify the software.
+
+7. Notices
+
+You may not remove, alter, or obscure copyright notices, license notices, or
+attribution notices in the software or source code.
+
+8. Termination
+
+Any violation of this license automatically terminates all rights granted to you.
+After termination, you must stop using the software and delete all copies in
+your possession or control.
+
+9. No warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Commercial licensing or written permission requires explicit approval from the
+copyright holder.
