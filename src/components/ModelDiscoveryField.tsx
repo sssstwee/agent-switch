@@ -1,6 +1,5 @@
 import { ArrowsClockwise as RefreshCwIcon } from "@phosphor-icons/react";
 import { Input } from "../nativeUi.tsx";
-import type { VendorPreset } from "../appTypes.ts";
 
 type ModelDiscoveryFieldProps = {
   label?: string;
