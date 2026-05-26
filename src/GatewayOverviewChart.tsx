@@ -33,6 +33,7 @@ const chartColors = {
   input: "#2563eb",
   output: "#16a34a",
   cache: "#d97706",
+  cacheCreation: "#0891b2",
   request: "#7c3aed",
   error: "#dc2626",
   grid: "rgba(107, 114, 128, 0.22)",
@@ -80,6 +81,7 @@ function t(key: string, language: AppLanguage) {
     "错误率": "Error Rate",
     "总 Token": "Total Tokens",
     "缓存命中": "Cache Hit",
+    "缓存写入": "Cache Write",
     "延迟 P50": "P50 Latency",
     "延迟 P95": "P95 Latency",
     "Token 趋势": "Token Trends",
@@ -97,7 +99,6 @@ function t(key: string, language: AppLanguage) {
     "最近错误": "Recent Errors",
     "输入": "Input",
     "输出": "Output",
-    "缓存": "Cache",
   };
   return language === "en" ? (dict[key] ?? key) : key;
 }
@@ -122,13 +123,15 @@ export function GatewayOverviewChart({
 
   const inputKey = t("输入", language);
   const outputKey = t("输出", language);
-  const cacheKey = t("缓存", language);
+  const cacheKey = t("缓存命中", language);
+  const cacheCreationKey = t("缓存写入", language);
 
   const chartRows = overview.timeseries.map((item) => ({
     label: formatBucketLabel(item.start_millis, bucket, language),
     [inputKey]: item.input_tokens,
     [outputKey]: item.output_tokens,
     [cacheKey]: item.cache_tokens,
+    [cacheCreationKey]: item.cache_creation_tokens,
     [t("请求", language)]: item.request_count,
     [t("错误", language)]: item.error_count,
   }));
@@ -142,6 +145,7 @@ export function GatewayOverviewChart({
     { name: t("输入", language), value: stats.input_tokens, color: chartColors.input },
     { name: t("输出", language), value: stats.output_tokens, color: chartColors.output },
     { name: t("缓存命中", language), value: stats.cache_tokens, color: chartColors.cache },
+    { name: t("缓存写入", language), value: stats.cache_creation_tokens, color: chartColors.cacheCreation },
   ].filter((item) => item.value > 0);
 
 
@@ -220,6 +224,7 @@ export function GatewayOverviewChart({
                 <Line type="monotone" dataKey={inputKey} stroke={chartColors.input} strokeWidth={2} dot={false} />
                 <Line type="monotone" dataKey={outputKey} stroke={chartColors.output} strokeWidth={2} dot={false} />
                 <Line type="monotone" dataKey={cacheKey} stroke={chartColors.cache} strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey={cacheCreationKey} stroke={chartColors.cacheCreation} strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>

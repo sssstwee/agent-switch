@@ -120,6 +120,9 @@ export function formFromConfigJson(form: AddForm, raw: string): AddForm {
   }
 
   const env = envSource as Record<string, unknown>;
+  const permissions = parsed.permissions && typeof parsed.permissions === "object" && !Array.isArray(parsed.permissions)
+    ? parsed.permissions as Record<string, unknown>
+    : {};
   const authField = authFields.find((key) => envString(env, key) !== undefined);
   const nextAuthField = authField ?? form.auth_field;
 
@@ -267,6 +270,10 @@ export function formFromConfigJson(form: AddForm, raw: string): AddForm {
       skip_introduction:
         (parsed as { skipIntroduction?: unknown }).skipIntroduction !== false &&
         form.config_options.skip_introduction,
+      bypass_permissions:
+        permissions.defaultMode === "bypassPermissions" ||
+        permissions.skipDangerousModePermissionPrompt === true ||
+        form.config_options.bypass_permissions,
       disable_telemetry:
         envFlag(env, "DISABLE_TELEMETRY", form.config_options.disable_telemetry) ||
         envFlag(env, "DO_NOT_TRACK", false),

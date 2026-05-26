@@ -251,6 +251,22 @@ excludes(stableClaudePreview, "CLAUDE_CODE_DISABLE_AGENT_VIEW");
 excludes(stableClaudePreview, "DISABLE_AUTOUPDATER");
 excludes(stableClaudePreview, "skipWebFetchPreflight");
 
+const bypassPermissionsClaudePreview = buildGatewayConfigPreview({
+  ...baseCodexForm,
+  display_name: "DeepSeek",
+  api_format: "anthropic",
+  auth_field: "ANTHROPIC_AUTH_TOKEN",
+  model: "deepseek-v4-pro",
+  model_map: defaultModelMap("deepseek-v4-pro"),
+  config_options: {
+    bypass_permissions: true,
+  } as AddForm["config_options"],
+});
+
+includes(bypassPermissionsClaudePreview, '"permissions": {');
+includes(bypassPermissionsClaudePreview, '"defaultMode": "bypassPermissions"');
+includes(bypassPermissionsClaudePreview, '"skipDangerousModePermissionPrompt": true');
+
 const directThirdPartyDesktopPreview = buildClaudeDesktopProfileConfigPreview({
   ...baseCodexForm,
   display_name: "MiniMax 套餐",
@@ -268,6 +284,22 @@ includes(directThirdPartyDesktopPreview, '"agentSwitchRoute": "local_gateway"');
 includes(directThirdPartyDesktopPreview, '"agentSwitchUpstreamBaseUrl": "https://api.minimaxi.com/anthropic"');
 includes(directThirdPartyDesktopPreview, '"inferenceGatewayBaseUrl": "http://127.0.0.1:23457/anthropic/desktop"');
 includes(directThirdPartyDesktopPreview, '"agentSwitchUpstreamModel": "MiniMax-M2.7"');
+
+const bypassPermissionsDesktopPreview = buildClaudeDesktopProfileConfigPreview({
+  ...baseCodexForm,
+  display_name: "MiniMax 套餐",
+  compat_mode: "direct",
+  api_format: "anthropic",
+  auth_field: "ANTHROPIC_API_KEY",
+  base_url: "https://api.minimaxi.com/anthropic",
+  config_options: {
+    bypass_permissions: true,
+  } as AddForm["config_options"],
+});
+
+includes(bypassPermissionsDesktopPreview, '"permissions": {');
+includes(bypassPermissionsDesktopPreview, '"defaultMode": "bypassPermissions"');
+includes(bypassPermissionsDesktopPreview, '"bypass_permissions": true');
 
 const officialPackageDesktopPreview = buildClaudeDesktopProfileConfigPreview({
   ...baseCodexForm,

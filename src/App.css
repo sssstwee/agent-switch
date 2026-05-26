@@ -1916,6 +1916,22 @@ button {
   color: var(--ok);
 }
 
+.ccr-proxy-call-cache.write {
+  border-color: color-mix(in oklab, var(--warning) 28%, var(--line));
+  background: var(--warning-soft);
+  color: var(--warning-soft-foreground);
+}
+
+.ccr-proxy-call-cache.empty {
+  border-color: color-mix(in srgb, var(--line) 84%, transparent);
+  background: var(--surface-2);
+  color: var(--ink-4);
+}
+
+.ccr-proxy-call-cache.unknown {
+  color: var(--ink-4);
+}
+
 .ccr-proxy-call-table small {
   display: inline;
   color: var(--ink-4);

@@ -120,28 +120,37 @@ function writeGatewayApiKeyFields(target: Record<string, unknown>, form: AddForm
   target.inferenceGatewayAuthScheme = "bearer";
 }
 
+function writeClaudePermissionOptions(target: Record<string, unknown>, configOptions: AddForm["config_options"]) {
+  if (!configOptions.bypass_permissions) return;
+  target.permissions = {
+    ...((target.permissions && typeof target.permissions === "object" && !Array.isArray(target.permissions))
+      ? target.permissions as Record<string, unknown>
+      : {}),
+    defaultMode: "bypassPermissions",
+    skipDangerousModePermissionPrompt: true,
+  };
+}
+
 export function buildClaudeDesktopProfileConfigPreview(form: AddForm) {
   if (isClaudeDesktopOfficialPackageForm(form)) {
-    return JSON.stringify(
-      {
-        agentSwitchClient: "Claude Desktop",
-        agentSwitchConfigRole: "profile",
-        agentSwitchRoute: "official",
-        agentSwitchOfficialAuth: "claude.ai",
-        disableDeploymentModeChooser: true,
-        inferenceModels: buildGatewayModels(claudeOfficialModelMap, [
-          "claude-opus-4-7",
-          "claude-sonnet-4-6",
-          "claude-haiku-4-5",
-        ]).map((model) => ({
-          name: model.name,
-          supports1m: model.supports_1m,
-        })),
-        configOptions: form.config_options,
-      },
-      null,
-      2,
-    );
+    const config: Record<string, unknown> = {
+      agentSwitchClient: "Claude Desktop",
+      agentSwitchConfigRole: "profile",
+      agentSwitchRoute: "official",
+      agentSwitchOfficialAuth: "claude.ai",
+      disableDeploymentModeChooser: true,
+      inferenceModels: buildGatewayModels(claudeOfficialModelMap, [
+        "claude-opus-4-7",
+        "claude-sonnet-4-6",
+        "claude-haiku-4-5",
+      ]).map((model) => ({
+        name: model.name,
+        supports1m: model.supports_1m,
+      })),
+      configOptions: form.config_options,
+    };
+    writeClaudePermissionOptions(config, form.config_options);
+    return JSON.stringify(config, null, 2);
   }
 
   const providerModelMap = form.provider_model_map ?? form.model_map;
@@ -169,6 +178,7 @@ export function buildClaudeDesktopProfileConfigPreview(form: AddForm) {
     agentSwitchProviderModelMap: providerModelMap,
   };
 
+  writeClaudePermissionOptions(config, form.config_options);
   writeGatewayApiKeyFields(config, form);
   if (form.use_full_url) config.inferenceGatewayUseFullUrl = true;
   if (form.note.trim()) config.inferenceGatewayNote = form.note;
@@ -749,6 +759,7 @@ export function buildGatewayConfigPreview(form: AddForm, target: TargetKey = "cl
     ANTHROPIC_DEFAULT_HAIKU_MODEL: modelMap.haiku,
   };
   const settings: Record<string, unknown> = { env };
+  writeClaudePermissionOptions(settings, configOptions);
 
   if (configOptions.hide_ai_signature) {
     env.CLAUDE_CODE_ATTRIBUTION_HEADER = "0";

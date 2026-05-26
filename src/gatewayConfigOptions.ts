@@ -52,6 +52,7 @@ export const defaultGatewayConfigOptions: GatewayConfigOptions = {
   api_timeout_long: false,
   skip_webfetch_preflight: false,
   skip_introduction: true,
+  bypass_permissions: false,
   disable_telemetry: false,
   disable_nonessential_traffic: false,
   disable_auto_update: false,
@@ -292,6 +293,12 @@ export const gatewayConfigOptionItems: Array<{
     configFields: ["skipIntroduction"],
   },
   {
+    key: "bypass_permissions",
+    label: "Bypass permissions",
+    description: "写入 permissions.defaultMode=\"bypassPermissions\" 与 skipDangerousModePermissionPrompt=true，跳过工具权限提示；仅适合隔离容器、VM 或完全信任的本机环境。",
+    configFields: ["permissions.defaultMode", "permissions.skipDangerousModePermissionPrompt"],
+  },
+  {
     key: "disable_telemetry",
     label: "禁用遥测",
     description: "写入 DISABLE_TELEMETRY=1 和 DO_NOT_TRACK=1，关闭遥测/跟踪类上报。",
@@ -355,6 +362,7 @@ const alwaysSupportedConfigOptions = new Set<GatewayConfigOptionKey>([
   "disable_terminal_title",
   "api_timeout_long",
   "skip_introduction",
+  "bypass_permissions",
   "disable_telemetry",
   "disable_nonessential_traffic",
 ]);

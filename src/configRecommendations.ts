@@ -150,6 +150,14 @@ export function getClaudeConfigOptionRecommendation(input: ClaudeConfigAdviceInp
     };
   }
 
+  if (input.option === "bypass_permissions") {
+    return {
+      statusText: "高风险按需开启",
+      tone: "warn",
+      recommendation: "按需勾选：该项会让 Claude Code 跳过大多数工具权限提示，只建议在隔离容器、VM 或你完全信任的本机工作区使用。",
+    };
+  }
+
   if (optionalClaudeOptions.has(input.option)) {
     return {
       statusText: "按需勾选",
