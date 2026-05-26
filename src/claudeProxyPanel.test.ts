@@ -15,6 +15,7 @@ function readSource(path: string) {
 }
 
 const appTsx = readSource("./App.tsx");
+const tomlUtils = readSource("./tomlUtils.ts");
 const appCss = readFileSync(new URL("./App.css", import.meta.url), "utf8").replace(/\r\n/g, "\n");
 const gatewayProfile = readSource("./gatewayProfile.ts");
 const configPreviews = readSource("./configPreviews.ts");
@@ -343,7 +344,8 @@ equal(appTsx.includes("如果最新模型不可用或额度耗尽，可把默认
 equal(appTsx.includes("官方返回的账号、额度或模型不可用错误会透传到 Codex 对话界面"), true);
 equal(appTsx.includes("同步官方配置失败：${String(error)}。没有官方账号不影响三方配置使用。"), true);
 equal(appTsx.includes("function renderOfficialCodexModelField()"), true);
-equal(appTsx.includes("function mergeCodexOfficialModelIntoToml"), true);
+equal(appTsx.includes("import { mergeCodexOfficialModelIntoToml } from \"./tomlUtils.ts\";"), true);
+equal(tomlUtils.includes("function mergeCodexOfficialModelIntoToml"), true);
 equal(appTsx.includes("function handleImportOfficialCodexProfileToForm()"), true);
 equal(appTsx.includes("nativeCommand.importOfficialCodexProfile"), true);
 equal(appTsx.includes("currentCodexLocalProfile ? ("), false);
@@ -439,8 +441,8 @@ equal(gatewayConfigOptions.includes("display.streaming"), true);
 equal(appTsx.includes("shouldApplyNewClientProfile"), true);
 equal(appTsx.includes("!isClaudeGatewayTarget(target)"), true);
 equal(appTsx.includes("!isCodexTarget(target)"), true);
-equal(appTsx.includes("const nextSupports1m = e.currentTarget.checked;"), true);
-equal(appTsx.includes("const checked = Boolean(addForm.supports_1m_context);"), true);
+equal(appTsx.includes("const nextSupports1m = e.currentTarget.checked;"), false);
+equal(appTsx.includes("const checked = Boolean(addForm.supports_1m_context);"), false);
 equal(appTsx.includes("addForm.supports_1m_context || catalogSupports1m"), false);
 equal(appTsx.includes("supports_1m_context: e.currentTarget.checked"), false);
 equal(appTsx.includes("const nextModel = e.currentTarget.value;"), true);

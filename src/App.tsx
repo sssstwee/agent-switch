@@ -191,6 +191,7 @@ import {
   TargetLogo,
   VendorLogo,
 } from "./components/AppUiPrimitives.tsx";
+import { OneMillionContextField } from "./components/OneMillionContextField.tsx";
 import {
   GatewayPage,
   getGatewaySnapshot as buildGatewaySnapshot,
@@ -214,31 +215,7 @@ function envCheckCardSortIndex(key: string) {
   return index >= 0 ? index : ENV_CHECK_CARD_ORDER.length;
 }
 
-function mergeTopLevelTomlString(toml: string, key: string, value: string) {
-  const assignment = `${key} = "${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
-  if (!toml.trim()) return assignment;
-  const lines = toml.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
-  const firstSectionIndex = lines.findIndex((line) => /^\s*\[[^\]]+\]/.test(line));
-  const topLevelEnd = firstSectionIndex >= 0 ? firstSectionIndex : lines.length;
-  const existingIndex = lines
-    .slice(0, topLevelEnd)
-    .findIndex((line) => new RegExp(`^\\s*${key}\\s*=`).test(line));
-  if (existingIndex >= 0) {
-    const next = [...lines];
-    next[existingIndex] = assignment;
-    return next.join("\n").trimEnd();
-  }
-  const next = [...lines];
-  const insertAt = firstSectionIndex >= 0 ? firstSectionIndex : next.length;
-  next.splice(insertAt, 0, assignment);
-  return next.join("\n").trimEnd();
-}
-
-function mergeCodexOfficialModelIntoToml(toml: string, model: string) {
-  const trimmed = model.trim();
-  if (!trimmed) return toml;
-  return mergeTopLevelTomlString(toml, "model", trimmed);
-}
+import { mergeCodexOfficialModelIntoToml } from "./tomlUtils.ts";
 
 function App() {
   const [state, setState] = useState<AppState | null>(null);
@@ -2477,42 +2454,16 @@ function App() {
 
   function renderOneMillionContextField() {
     if (isOfficialCodexDirect || isAnthropicPackageDirect || isOfficialAnthropicDirect) return null;
-    const checked = Boolean(addForm.supports_1m_context);
     return (
-      <div className="ccr-config-options">
-        <Tooltip.Root delay={350}>
-          <Tooltip.Trigger className="ccr-option-tooltip-trigger">
-            <label className="ccr-check">
-              <input
-                type="checkbox"
-                checked={checked}
-                onChange={(e) => {
-                  const nextSupports1m = e.currentTarget.checked;
-                  setAddForm((form) => ({
-                    ...form,
-                    supports_1m_context: nextSupports1m,
-                  }));
-                }}
-              />
-              <span>1M 上下文</span>
-            </label>
-          </Tooltip.Trigger>
-          <Tooltip.Content showArrow className="ccr-option-tooltip">
-            <div className="ccr-tooltip-section">
-              <div className="ccr-tooltip-label">说明</div>
-              <div>
-                能力表已确认的模型会自动开启；能力表未覆盖但厂商实际支持时，可手动勾选。
-              </div>
-            </div>
-            <div className="ccr-tooltip-section">
-              <div className="ccr-tooltip-label">生效</div>
-              <div>
-                Codex 写入 1,000,000 context window；Claude Code 对主模型、Opus、Sonnet 写入 [1m]。
-              </div>
-            </div>
-          </Tooltip.Content>
-        </Tooltip.Root>
-      </div>
+      <OneMillionContextField
+        checked={Boolean(addForm.supports_1m_context)}
+        onChange={(nextSupports1m) => {
+          setAddForm((form) => ({
+            ...form,
+            supports_1m_context: nextSupports1m,
+          }));
+        }}
+      />
     );
   }
 
