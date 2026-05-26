@@ -18,6 +18,10 @@ function excludes(source: string, unexpected: string) {
   }
 }
 
+function readSource(path: string) {
+  return readFileSync(new URL(path, import.meta.url), "utf8").replace(/\r\n/g, "\n");
+}
+
 function count(source: string, text: string) {
   return source.split(text).length - 1;
 }
@@ -43,17 +47,18 @@ includes(appTsx, "DropdownMenuPrimitive.Item");
 includes(appTsx, "duplicateProfile(profile.id);");
 includes(appTsx, "void deleteProfile(profile.id);");
 includes(appTsx, "ccr-config-more-item ccr-config-more-item-danger");
-includes(appTsx, "ShareNetwork as GatewayIcon");
+const gatewayRequirementIcon = readSource("./components/GatewayRequirementIcon.tsx");
+includes(gatewayRequirementIcon, "ShareNetwork as GatewayIcon");
 includes(appTsx, "function renderGatewayRequirementIcon(requirement: GatewayRequirement)");
 includes(appTsx, "gatewayRequirementForProfile(target, profile as CodexProfile | GatewayProfile, profilePreset)");
 includes(appTsx, "renderGatewayRequirementIcon(profileGatewayRequirement)");
-includes(appTsx, "const requirementTooltipText = language === \"en\"");
-includes(appTsx, "Gateway recommendation: ${label}. ${detail}");
-includes(appTsx, "<Tooltip.Trigger asChild>");
-includes(appTsx, "ccr-gateway-requirement-badge");
-includes(appTsx, "ccr-gateway-requirement-tooltip");
-includes(appTsx, "({ \"必开\": \"Req\", \"建议\": \"Rec\", \"无需\": \"No\" } as const)[requirement.cornerLabel]");
-includes(appTsx, "{cornerLabel}");
+includes(gatewayRequirementIcon, "const requirementTooltipText = language === \"en\"");
+includes(gatewayRequirementIcon, "Gateway recommendation: ${label}. ${detail}");
+includes(gatewayRequirementIcon, "<Tooltip.Trigger asChild>");
+includes(gatewayRequirementIcon, "ccr-gateway-requirement-badge");
+includes(gatewayRequirementIcon, "ccr-gateway-requirement-tooltip");
+includes(gatewayRequirementIcon, "({ \"必开\": \"Req\", \"建议\": \"Rec\", \"无需\": \"No\" } as const)[requirement.cornerLabel]");
+includes(gatewayRequirementIcon, "{cornerLabel}");
 includes(uiTranslation, "[/^必开$/, \"Req\"]");
 includes(uiTranslation, "[/^建议$/, \"Rec\"]");
 includes(uiTranslation, "[/^无需$/, \"No\"]");
