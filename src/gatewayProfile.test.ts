@@ -65,6 +65,7 @@ const baseProfile: GatewayProfile = {
     api_timeout_long: false,
     skip_webfetch_preflight: false,
     skip_introduction: false,
+    bypass_permissions: false,
     disable_telemetry: false,
     disable_nonessential_traffic: false,
     disable_auto_update: false,

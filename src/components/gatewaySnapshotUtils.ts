@@ -20,7 +20,14 @@ export type GatewaySnapshotBase = {
   compactMetaLabel: string;
   compactMetaValue: string;
   proxyStatusText: string;
-  stats: { request_count: number; input_tokens: number; output_tokens: number; total_tokens: number; cache_tokens: number };
+  stats: {
+    request_count: number;
+    input_tokens: number;
+    output_tokens: number;
+    total_tokens: number;
+    cache_tokens: number;
+    cache_creation_tokens: number;
+  };
   hasProfile: boolean;
 };
 
@@ -99,7 +106,7 @@ export function resolveGatewaySnapshotBase(
   );
   const proxyStatusText = extra?.statusTextOverride ?? (running ? "运行中" : "已关闭");
   const stats = targetProxyStatus?.stats ?? {
-    request_count: 0, input_tokens: 0, output_tokens: 0, total_tokens: 0, cache_tokens: 0,
+    request_count: 0, input_tokens: 0, output_tokens: 0, total_tokens: 0, cache_tokens: 0, cache_creation_tokens: 0,
   };
 
   return {

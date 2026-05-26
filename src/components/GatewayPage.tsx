@@ -127,6 +127,49 @@ export function resolveGatewaySelectedTarget(
 
 const PROXY_CALL_PAGE_SIZE_OPTIONS = [20, 50, 100] as const;
 
+function formatProxyCallCacheState(call: CodexProxyCallSummaryRecord) {
+  const hitTokens = Math.max(0, Number(call.cache_tokens ?? 0));
+  const creationTokens = Math.max(0, Number(call.cache_creation_tokens ?? 0));
+  if (hitTokens > 0 && creationTokens > 0) {
+    return {
+      label: "命中+写入",
+      className: "ccr-proxy-call-cache hit",
+      note: `命中 ${formatProxyTokenK(hitTokens)} / 写入 ${formatProxyTokenK(creationTokens)}`,
+      title: `缓存命中 ${formatProxyTokenTooltip(hitTokens)}，缓存写入 ${formatProxyTokenTooltip(creationTokens)}`,
+    };
+  }
+  if (hitTokens > 0) {
+    return {
+      label: "命中",
+      className: "ccr-proxy-call-cache hit",
+      note: formatProxyTokenK(hitTokens),
+      title: `缓存命中 ${formatProxyTokenTooltip(hitTokens)}`,
+    };
+  }
+  if (creationTokens > 0) {
+    return {
+      label: "写入",
+      className: "ccr-proxy-call-cache write",
+      note: formatProxyTokenK(creationTokens),
+      title: `缓存写入 ${formatProxyTokenTooltip(creationTokens)}`,
+    };
+  }
+  if (call.cache_reported) {
+    return {
+      label: "无缓存",
+      className: "ccr-proxy-call-cache empty",
+      note: "0K",
+      title: "上游 usage 已报告 cache 字段，本次读取和写入都是 0",
+    };
+  }
+  return {
+    label: "未报告",
+    className: "ccr-proxy-call-cache unknown",
+    note: "-",
+    title: "上游 usage 未报告 cache 字段，不能判断是否启用缓存",
+  };
+}
+
 interface GatewayDetailContentProps {
   snapshot: GatewaySnapshot;
   codexProxyBusy: boolean;
@@ -336,9 +379,11 @@ function GatewayDetailContent({
               <span className="ccr-proxy-meta-label">总 Token</span>
               <span className="ccr-proxy-meta-value">{formatProxyTokenK(snapshot.stats.total_tokens)}</span>
             </div>
-            <div className="ccr-proxy-meta-item" title={formatProxyTokenTooltip(snapshot.stats.cache_tokens)}>
-              <span className="ccr-proxy-meta-label">缓存命中</span>
-              <span className="ccr-proxy-meta-value">{formatProxyTokenK(snapshot.stats.cache_tokens)}</span>
+            <div className="ccr-proxy-meta-item" title={`命中 ${formatProxyTokenTooltip(snapshot.stats.cache_tokens)} / 写入 ${formatProxyTokenTooltip(snapshot.stats.cache_creation_tokens)}`}>
+              <span className="ccr-proxy-meta-label">缓存命中/写入</span>
+              <span className="ccr-proxy-meta-value ccr-token-pair-value">
+                {formatProxyTokenK(snapshot.stats.cache_tokens)}/{formatProxyTokenK(snapshot.stats.cache_creation_tokens)}
+              </span>
             </div>
             <div className="ccr-proxy-meta-item" title="当前统计范围内 error 非空或 HTTP 状态码大于等于 400 的数量">
               <span className="ccr-proxy-meta-label">错误数</span>
@@ -392,6 +437,7 @@ function GatewayDetailContent({
                     const translatedCallError = call.error ? translateUiText(call.error, language) : "";
                     const translatedDetailError = detail?.error ? translateUiText(detail.error, language) : "";
                     const outputText = detail?.output || translatedDetailError || translatedCallError || translateUiText("加载中...", language);
+                    const cacheState = formatProxyCallCacheState(call);
                     return (
                       <Fragment key={call.id}>
                         <tr
@@ -430,10 +476,10 @@ function GatewayDetailContent({
                             <small className="ccr-proxy-call-inline-note">Total {formatProxyTokenK(call.total_tokens)}</small>
                           </td>
                           <td>
-                            <span className={call.cache_tokens > 0 ? "ccr-proxy-call-cache hit" : "ccr-proxy-call-cache"}>
-                              {call.cache_tokens > 0 ? "命中" : "未命中"}
+                            <span className={cacheState.className} title={cacheState.title}>
+                              {cacheState.label}
                             </span>
-                            <small className="ccr-proxy-call-inline-note">{formatProxyTokenK(call.cache_tokens)}</small>
+                            <small className="ccr-proxy-call-inline-note">{cacheState.note}</small>
                           </td>
                           <td>
                             <button

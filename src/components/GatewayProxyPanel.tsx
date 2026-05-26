@@ -57,8 +57,9 @@ export type GatewaySnapshot = {
     outputTokens: number;
     totalTokens: number;
     cacheTokens: number;
+    cacheCreationTokens: number;
   };
-  calls: Array<{ id: number; startedAtMillis: number; durationMs: number; endpoint: string; model: string; status: number; error: string; inputTokens: number; outputTokens: number; totalTokens: number; cacheTokens: number }>;
+  calls: Array<{ id: number; startedAtMillis: number; durationMs: number; endpoint: string; model: string; status: number; error: string; inputTokens: number; outputTokens: number; totalTokens: number; cacheTokens: number; cacheCreationTokens: number; cacheReported: boolean }>;
   proxyStatusText: string;
   profile: GatewayProfile | null;
 };
@@ -87,6 +88,7 @@ export function getGatewaySnapshot(
     endpoint: c.endpoint, model: c.model, status: c.status, error: c.error,
     inputTokens: c.input_tokens, outputTokens: c.output_tokens,
     totalTokens: c.total_tokens, cacheTokens: c.cache_tokens,
+    cacheCreationTokens: c.cache_creation_tokens, cacheReported: c.cache_reported,
   }));
 
   return {
@@ -97,7 +99,7 @@ export function getGatewaySnapshot(
     stats: {
       requestCount: base.stats.request_count, inputTokens: base.stats.input_tokens,
       outputTokens: base.stats.output_tokens, totalTokens: base.stats.total_tokens,
-      cacheTokens: base.stats.cache_tokens,
+      cacheTokens: base.stats.cache_tokens, cacheCreationTokens: base.stats.cache_creation_tokens,
     },
     calls,
     profile: base.profile as GatewayProfile | null,

@@ -69,6 +69,7 @@ export type GatewayConfigOptions = {
   api_timeout_long: boolean;
   skip_webfetch_preflight: boolean;
   skip_introduction: boolean;
+  bypass_permissions: boolean;
   disable_telemetry: boolean;
   disable_nonessential_traffic: boolean;
   disable_auto_update: boolean;
@@ -198,8 +199,10 @@ export type CodexProxyOverviewStats = {
   output_tokens: number;
   total_tokens: number;
   cache_tokens: number;
+  cache_creation_tokens: number;
   latest_input_tokens: number;
   latest_cache_tokens: number;
+  latest_cache_creation_tokens: number;
   avg_latency_ms: number;
   p50_latency_ms: number;
   p95_latency_ms: number;
@@ -214,6 +217,7 @@ export type CodexProxyOverviewBucketRow = {
   output_tokens: number;
   total_tokens: number;
   cache_tokens: number;
+  cache_creation_tokens: number;
 };
 
 export type CodexProxyOverviewModelRow = {
@@ -224,6 +228,7 @@ export type CodexProxyOverviewModelRow = {
   output_tokens: number;
   total_tokens: number;
   cache_tokens: number;
+  cache_creation_tokens: number;
   avg_latency_ms: number;
 };
 
@@ -233,6 +238,7 @@ export type CodexProxyUsageStats = {
   output_tokens: number;
   total_tokens: number;
   cache_tokens: number;
+  cache_creation_tokens: number;
 };
 
 export type CodexProxyCallSummaryRecord = {
@@ -250,6 +256,8 @@ export type CodexProxyCallSummaryRecord = {
   output_tokens: number;
   total_tokens: number;
   cache_tokens: number;
+  cache_creation_tokens: number;
+  cache_reported: boolean;
 };
 
 export type CodexProxyCallRecord = CodexProxyCallSummaryRecord & {
