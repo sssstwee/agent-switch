@@ -22,7 +22,6 @@ type CodexConfigPanelProps = {
   onCodexConfigOptionChange: (key: string, checked: boolean) => void;
   onImportOfficialProfile: () => void;
   onApplyRecommended: () => void;
-  onResetToDefault: () => void;
 };
 
 export function CodexConfigPanel({
@@ -39,7 +38,6 @@ export function CodexConfigPanel({
   onCodexConfigOptionChange,
   onImportOfficialProfile,
   onApplyRecommended,
-  onResetToDefault,
 }: CodexConfigPanelProps) {
   const codexPanelTitle = isOfficialCodexDirect ? "官方登录配置" : "Codex 生效预览";
 
@@ -106,9 +104,6 @@ export function CodexConfigPanel({
               <div className="ccr-option-actions-buttons">
                 <button type="button" className="ccr-option-action" onClick={onApplyRecommended}>
                   应用推荐配置
-                </button>
-                <button type="button" className="ccr-option-action secondary" onClick={onResetToDefault}>
-                  恢复默认
                 </button>
               </div>
             </div>

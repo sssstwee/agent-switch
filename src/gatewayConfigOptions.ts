@@ -587,12 +587,22 @@ const documentedClaudeCodeGatewayPresets = new Set([
 ]);
 
 export const recommendedClaudeGatewayConfigOptionKeys = new Set<GatewayConfigOptionKey>([
+  "hide_ai_signature",
   "enable_tool_search",
   "enable_stream_watchdog",
   "api_timeout_long",
   "skip_introduction",
   "auto_compact",
   "compact_early",
+  "disable_telemetry",
+  "disable_nonessential_traffic",
+]);
+
+export const recommendedClaudeDesktopConfigOptionKeys = new Set<GatewayConfigOptionKey>([
+  "enable_stream_watchdog",
+  "api_timeout_long",
+  "disable_telemetry",
+  "disable_nonessential_traffic",
 ]);
 
 const explicitEffortPresets = new Set(["anthropic", "deepseek"]);
@@ -800,6 +810,23 @@ export function withRecommendedGatewayConfigOptions(
   return next;
 }
 
+export function withRecommendedClaudeDesktopConfigOptions(
+  options: GatewayConfigOptions,
+  preset: VendorPreset | null,
+): GatewayConfigOptions {
+  const next = sanitizeConfigOptionsForPreset(options, preset);
+  if (!preset || preset.id.includes("anthropic")) {
+    return next;
+  }
+  const supported = getSupportedConfigOptions(preset);
+  for (const key of recommendedClaudeDesktopConfigOptionKeys) {
+    if (supported.has(key)) {
+      next[key] = true;
+    }
+  }
+  return next;
+}
+
 export function getTargetConfigOptionSupport(
   option: (typeof gatewayConfigOptionItems)[number],
   target: TargetKey,
@@ -868,7 +895,11 @@ export function withRecommendedGatewayTargetConfigOptions(
   preset: VendorPreset | null,
   isOfficialAnthropicDirect: boolean,
 ): GatewayConfigOptions {
-  if (target === "claude_cli" || target === "claude_desktop") {
+  if (target === "claude_desktop") {
+    return withRecommendedClaudeDesktopConfigOptions(options, preset);
+  }
+
+  if (target === "claude_cli") {
     return withRecommendedGatewayConfigOptions(options, preset);
   }
 
@@ -913,6 +944,9 @@ export function configOptionItemsForTarget(target: TargetKey, isOfficialAnthropi
   if (target === "openclaw") return openclawConfigOptionItems;
   if (target === "hermes") return hermesConfigOptionItems;
   if (["antigravity", "oh_my_opencode", "pi", "oh_my_pi"].includes(target)) return [];
+  if (target === "claude_desktop") {
+    return gatewayConfigOptionItems.filter((option) => recommendedClaudeDesktopConfigOptionKeys.has(option.key));
+  }
   const claudeOptions = gatewayConfigOptionItems.filter((option) => !hiddenClaudeConfigOptionKeys.has(option.key));
   return isOfficialAnthropicDirect
     ? claudeOptions.filter((option) => !isGatewayOnlyConfigOption(option.key))

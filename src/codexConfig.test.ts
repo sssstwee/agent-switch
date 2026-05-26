@@ -10,6 +10,7 @@ import {
   configOptionItemsForTarget,
   defaultGatewayConfigOptions,
   getTargetConfigOptionSupport,
+  recommendedClaudeDesktopConfigOptionKeys,
   recommendedCodexConfigOptionsForForm,
   withRecommendedGatewayTargetConfigOptions,
   withRecommendedGatewayConfigOptions,
@@ -285,7 +286,31 @@ equal(recommendedGatewayOptions.disable_auto_update, false);
 equal(recommendedGatewayOptions.skip_webfetch_preflight, false);
 equal(recommendedGatewayOptions.auto_compact, true);
 equal(recommendedGatewayOptions.compact_early, true);
+equal(recommendedGatewayOptions.hide_ai_signature, true);
+equal(recommendedGatewayOptions.disable_telemetry, true);
+equal(recommendedGatewayOptions.disable_nonessential_traffic, true);
 equal(recommendedGatewayOptions.enable_fine_grained_tool_streaming, false);
+
+const recommendedDesktopOptions = withRecommendedGatewayTargetConfigOptions(
+  { ...defaultGatewayConfigOptions },
+  "claude_desktop",
+  deepseekPreset,
+  false,
+);
+equal(recommendedDesktopOptions.enable_stream_watchdog, true);
+equal(recommendedDesktopOptions.api_timeout_long, true);
+equal(recommendedDesktopOptions.disable_telemetry, true);
+equal(recommendedDesktopOptions.disable_nonessential_traffic, true);
+equal(recommendedDesktopOptions.enable_tool_search, false);
+equal(recommendedDesktopOptions.auto_compact, false);
+equal(recommendedDesktopOptions.compact_early, false);
+equal(recommendedDesktopOptions.skip_introduction, true);
+
+const desktopOptionKeys = configOptionItemsForTarget("claude_desktop", false).map((option) => option.key);
+equal(desktopOptionKeys.length, recommendedClaudeDesktopConfigOptionKeys.size);
+for (const key of recommendedClaudeDesktopConfigOptionKeys) {
+  includes(desktopOptionKeys, key);
+}
 
 const hiddenClaudeOptionKeys = [
   "disable_experimental_betas",

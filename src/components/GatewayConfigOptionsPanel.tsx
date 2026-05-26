@@ -5,6 +5,7 @@ import {
 import {
   getConfigOptionSupport,
   getTargetConfigOptionSupport,
+  recommendedClaudeDesktopConfigOptionKeys,
   recommendedClaudeGatewayConfigOptionKeys,
 } from "../gatewayConfigOptions.ts";
 import { isClaudeGatewayTarget } from "./gatewayHelpers.ts";
@@ -27,7 +28,6 @@ type GatewayConfigOptionsPanelProps = {
   configOptions: AddForm["config_options"];
   onConfigOptionChange: (key: GatewayConfigOptionKey, checked: boolean) => void;
   onApplyRecommended: () => void;
-  onResetToDefault: () => void;
 };
 
 export function GatewayConfigOptionsPanel({
@@ -39,10 +39,12 @@ export function GatewayConfigOptionsPanel({
   configOptions,
   onConfigOptionChange,
   onApplyRecommended,
-  onResetToDefault,
 }: GatewayConfigOptionsPanelProps) {
   const isClaudeTarget = isClaudeGatewayTarget(target);
-  const optionActionNote = isClaudeTarget
+  const isClaudeDesktopTarget = target === "claude_desktop";
+  const optionActionNote = isClaudeDesktopTarget
+    ? "按 Claude Desktop 经由本地网关的稳定体验自动勾选推荐项。"
+    : isClaudeTarget
     ? "按当前厂商和 Claude Code 支持情况自动勾选稳定项。"
     : "按当前应用官方文档自动勾选稳定项。";
 
@@ -70,9 +72,6 @@ export function GatewayConfigOptionsPanel({
             <div className="ccr-option-actions-buttons">
               <button type="button" className="ccr-option-action" onClick={onApplyRecommended}>
                 应用推荐配置
-              </button>
-              <button type="button" className="ccr-option-action secondary" onClick={onResetToDefault}>
-                恢复默认
               </button>
             </div>
           </div>
@@ -103,7 +102,11 @@ export function GatewayConfigOptionsPanel({
                     };
               const isRecommendedDefault =
                 support.supported &&
-                (isClaudeTarget
+                (isClaudeDesktopTarget
+                  ? Boolean(currentSelectedPreset) &&
+                    !currentSelectedPreset?.id.includes("anthropic") &&
+                    recommendedClaudeDesktopConfigOptionKeys.has(option.key)
+                  : isClaudeTarget
                   ? Boolean(currentSelectedPreset) &&
                     !currentSelectedPreset?.id.includes("anthropic") &&
                     recommendedClaudeGatewayConfigOptionKeys.has(option.key)

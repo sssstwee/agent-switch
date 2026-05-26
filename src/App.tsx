@@ -98,7 +98,6 @@ import {
   defaultGatewayConfigOptions,
   recommendedCodexConfigOptionsForForm,
   sanitizeConfigOptionsForPreset,
-  sanitizeConfigOptionsForTarget,
   withRecommendedGatewayTargetConfigOptions,
   withRecommendedGatewayConfigOptions,
 } from "./gatewayConfigOptions.ts";
@@ -2174,7 +2173,9 @@ function App() {
         ? "配置 JSON5"
         : "配置 JSON";
   const targetConfigOptionsLabel = isClaudeGatewayTarget(target)
-    ? (isOfficialAnthropicDirect ? "Claude Code 选项" : targetConfigEditorLabel)
+    ? target === "claude_desktop"
+      ? "Claude Desktop 选项"
+      : (isOfficialAnthropicDirect ? "Claude Code 选项" : targetConfigEditorLabel)
     : `${targetDisplayName(target)} 官方选项`;
   const targetBaseUrlPlaceholder = isCodexTarget(target)
     ? "https://api.example.com/v1"
@@ -2340,52 +2341,10 @@ function App() {
     }));
   }
 
-  function resetClaudeOptionsToDefault() {
-    setAddForm((form) => ({
-      ...form,
-      config_options: {
-        ...sanitizeConfigOptionsForPreset({ ...defaultGatewayConfigOptions }, currentSelectedPreset),
-        write_general_config: form.config_options.write_general_config,
-      },
-    }));
-  }
-
-  function resetGatewayTargetOptionsToDefault() {
-    if (isClaudeGatewayTarget(target)) {
-      resetClaudeOptionsToDefault();
-      return;
-    }
-    setAddForm((form) => ({
-      ...form,
-      config_options: {
-        ...sanitizeConfigOptionsForTarget(
-          { ...defaultGatewayConfigOptions },
-          target,
-          currentSelectedPreset,
-          isOfficialAnthropicDirect,
-        ),
-        write_general_config: form.config_options.write_general_config,
-      },
-    }));
-  }
-
   function applyRecommendedCodexOptions() {
     setAddForm((form) => ({
       ...form,
       codex_config_options: recommendedCodexConfigOptionsForForm(form, currentSelectedPreset),
-    }));
-  }
-
-  function resetCodexOptionsToDefault() {
-    setAddForm((form) => ({
-      ...form,
-      codex_config_options: sanitizeCodexConfigOptionsForForm(
-        {
-          ...form,
-          codex_config_options: normalizeCodexConfigOptions({}),
-        },
-        currentSelectedPreset,
-      ),
     }));
   }
 
@@ -2408,7 +2367,6 @@ function App() {
           })
         }
         onApplyRecommended={applyRecommendedGatewayTargetOptions}
-        onResetToDefault={resetGatewayTargetOptionsToDefault}
       />
     );
   }
@@ -2456,7 +2414,6 @@ function App() {
         }
         onImportOfficialProfile={() => void handleImportOfficialCodexProfileToForm()}
         onApplyRecommended={applyRecommendedCodexOptions}
-        onResetToDefault={resetCodexOptionsToDefault}
       />
     );
   }
@@ -3079,6 +3036,7 @@ function App() {
                     open={desktopEffectiveConfigOpen}
                     onToggle={() => setDesktopEffectiveConfigOpen((open) => !open)}
                   />
+                  {renderClaudeConfigOptions(targetConfigOptionsLabel)}
                   <div className="ccr-config-preview-head">
                     <span>Claude Desktop 实际写入文件</span>
                   </div>
