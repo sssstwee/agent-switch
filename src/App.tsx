@@ -189,6 +189,7 @@ import {
 } from "./components/AppUiPrimitives.tsx";
 import { AddressVariantSwitch } from "./components/AddressVariantSwitch.tsx";
 import { GatewayRequirementIcon } from "./components/GatewayRequirementIcon.tsx";
+import { ModelDiscoveryField } from "./components/ModelDiscoveryField.tsx";
 import { OneMillionContextField } from "./components/OneMillionContextField.tsx";
 import {
   GatewayPage,
@@ -2273,52 +2274,19 @@ function App() {
 
   function renderModelDiscoveryField(label = "上游模型") {
     if (isOfficialCodexDirect || isAnthropicPackageDirect || isOfficialAnthropicDirect) return null;
-    const value = currentProviderModelValue();
-    const discoveryBaseUrl = currentModelDiscoveryBaseUrl();
     return (
-      <div className="ccr-edit-field">
-        <div className="ccr-field-label-row ccr-field-label-row-left">
-          <label>{label}</label>
-          <button
-            type="button"
-            className="ccr-inline-sync-action"
-            disabled={modelDiscoveryBusy || !discoveryBaseUrl.trim() || !addForm.api_key.trim()}
-            onClick={() => void handleDiscoverProviderModels()}
-            title="从当前模型发现地址的 /models 或 /v1/models 获取模型列表"
-          >
-            <RefreshCwIcon className="h-3 w-3" />
-            {modelDiscoveryBusy ? "获取中" : "获取模型"}
-          </button>
-        </div>
-        <Input
-          placeholder={currentSelectedPreset?.model_map.main || currentSelectedPreset?.models[0] || "gpt-5.5"}
-          value={value}
-          onChange={(e) => {
-            const nextModel = e.currentTarget.value;
-            setAddForm((form) => formWithSelectedProviderModel(form, nextModel));
-          }}
-        />
-        {providerModelCandidates.length > 0 ? (
-          <div className="ccr-model-candidates" aria-label="模型候选">
-            {providerModelCandidates.map((model) => (
-              <button
-                key={model}
-                type="button"
-                className={value === model ? "ccr-model-candidate active" : "ccr-model-candidate"}
-                onClick={() => setAddForm((form) => formWithSelectedProviderModel(form, model))}
-                title={model}
-              >
-                {model}
-              </button>
-            ))}
-          </div>
-        ) : null}
-        <span className="ccr-field-help">
-          {modelDiscoveryEndpoint
-            ? `模型列表来自 ${modelDiscoveryEndpoint}`
-            : "所有新增页都使用同一套模型发现；若厂商不开放模型端点，可直接填写模型 ID。"}
-        </span>
-      </div>
+      <ModelDiscoveryField
+        label={label}
+        value={currentProviderModelValue()}
+        apiKeyValue={addForm.api_key}
+        modelDiscoveryBusy={modelDiscoveryBusy}
+        modelDiscoveryEndpoint={modelDiscoveryEndpoint}
+        providerModelCandidates={providerModelCandidates}
+        placeholder={currentSelectedPreset?.model_map.main || currentSelectedPreset?.models[0] || "gpt-5.5"}
+        onDiscover={() => void handleDiscoverProviderModels()}
+        onChange={(nextModel) => setAddForm((form) => formWithSelectedProviderModel(form, nextModel))}
+        onSelectCandidate={(model) => setAddForm((form) => formWithSelectedProviderModel(form, model))}
+      />
     );
   }
 
