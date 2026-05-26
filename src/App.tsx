@@ -102,10 +102,10 @@ import {
   defaultGatewayConfigOptions,
   getConfigOptionSupport,
   getTargetConfigOptionSupport,
+  recommendedClaudeDesktopConfigOptionKeys,
   recommendedClaudeGatewayConfigOptionKeys,
   recommendedCodexConfigOptionsForForm,
   sanitizeConfigOptionsForPreset,
-  sanitizeConfigOptionsForTarget,
   withRecommendedGatewayTargetConfigOptions,
   withRecommendedGatewayConfigOptions,
 } from "./gatewayConfigOptions.ts";
@@ -2174,7 +2174,9 @@ function App() {
         ? "配置 JSON5"
         : "配置 JSON";
   const targetConfigOptionsLabel = isClaudeGatewayTarget(target)
-    ? (isOfficialAnthropicDirect ? "Claude Code 选项" : targetConfigEditorLabel)
+    ? target === "claude_desktop"
+      ? "Claude Desktop 选项"
+      : (isOfficialAnthropicDirect ? "Claude Code 选项" : targetConfigEditorLabel)
     : `${targetDisplayName(target)} 官方选项`;
   const targetBaseUrlPlaceholder = isCodexTarget(target)
     ? "https://api.example.com/v1"
@@ -2504,35 +2506,6 @@ function App() {
     }));
   }
 
-  function resetClaudeOptionsToDefault() {
-    setAddForm((form) => ({
-      ...form,
-      config_options: {
-        ...sanitizeConfigOptionsForPreset({ ...defaultGatewayConfigOptions }, currentSelectedPreset),
-        write_general_config: form.config_options.write_general_config,
-      },
-    }));
-  }
-
-  function resetGatewayTargetOptionsToDefault() {
-    if (isClaudeGatewayTarget(target)) {
-      resetClaudeOptionsToDefault();
-      return;
-    }
-    setAddForm((form) => ({
-      ...form,
-      config_options: {
-        ...sanitizeConfigOptionsForTarget(
-          { ...defaultGatewayConfigOptions },
-          target,
-          currentSelectedPreset,
-          isOfficialAnthropicDirect,
-        ),
-        write_general_config: form.config_options.write_general_config,
-      },
-    }));
-  }
-
   function applyRecommendedCodexOptions() {
     setAddForm((form) => ({
       ...form,
@@ -2540,22 +2513,12 @@ function App() {
     }));
   }
 
-  function resetCodexOptionsToDefault() {
-    setAddForm((form) => ({
-      ...form,
-      codex_config_options: sanitizeCodexConfigOptionsForForm(
-        {
-          ...form,
-          codex_config_options: normalizeCodexConfigOptions({}),
-        },
-        currentSelectedPreset,
-      ),
-    }));
-  }
-
   function renderClaudeConfigOptions(title: string) {
     const isClaudeTarget = isClaudeGatewayTarget(target);
-    const optionActionNote = isClaudeTarget
+    const isClaudeDesktopTarget = target === "claude_desktop";
+    const optionActionNote = isClaudeDesktopTarget
+      ? "按 Claude Desktop 经由本地网关的稳定体验自动勾选推荐项。"
+      : isClaudeTarget
       ? "按当前厂商和 Claude Code 支持情况自动勾选稳定项。"
       : "按当前应用官方文档自动勾选稳定项。";
     return (
@@ -2582,9 +2545,6 @@ function App() {
               <div className="ccr-option-actions-buttons">
                 <button type="button" className="ccr-option-action" onClick={applyRecommendedGatewayTargetOptions}>
                   应用推荐配置
-                </button>
-                <button type="button" className="ccr-option-action secondary" onClick={resetGatewayTargetOptionsToDefault}>
-                  恢复默认
                 </button>
               </div>
             </div>
@@ -2615,7 +2575,11 @@ function App() {
                       };
                 const isRecommendedDefault =
                   support.supported &&
-                  (isClaudeTarget
+                  (isClaudeDesktopTarget
+                    ? Boolean(currentSelectedPreset) &&
+                      !currentSelectedPreset?.id.includes("anthropic") &&
+                      recommendedClaudeDesktopConfigOptionKeys.has(option.key)
+                    : isClaudeTarget
                     ? Boolean(currentSelectedPreset) &&
                       !currentSelectedPreset?.id.includes("anthropic") &&
                       recommendedClaudeGatewayConfigOptionKeys.has(option.key)
@@ -2789,9 +2753,6 @@ function App() {
                 <div className="ccr-option-actions-buttons">
                   <button type="button" className="ccr-option-action" onClick={applyRecommendedCodexOptions}>
                     应用推荐配置
-                  </button>
-                  <button type="button" className="ccr-option-action secondary" onClick={resetCodexOptionsToDefault}>
-                    恢复默认
                   </button>
                 </div>
               </div>
@@ -3532,6 +3493,7 @@ function App() {
                     open={desktopEffectiveConfigOpen}
                     onToggle={() => setDesktopEffectiveConfigOpen((open) => !open)}
                   />
+                  {renderClaudeConfigOptions(targetConfigOptionsLabel)}
                   <div className="ccr-config-preview-head">
                     <span>Claude Desktop 实际写入文件</span>
                   </div>
