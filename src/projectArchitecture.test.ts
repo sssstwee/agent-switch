@@ -347,6 +347,19 @@ test("private core delegates MCP and skills commands to modules", () => {
   assert.equal(privateCore.includes("fn read_skills()"), false);
 });
 
+test("private core keeps proxy token parsing in the metrics module", () => {
+  const proxySource = readSource("../.private/agent-switch-private-core/src-tauri-core/src/codex_proxy.rs");
+  const metricsSource = readSource("../.private/agent-switch-private-core/src-tauri-core/src/codex_proxy/codex_proxy_metrics.rs");
+
+  assert.equal(proxySource.includes("mod codex_proxy_metrics;"), true);
+  assert.equal(metricsSource.includes("pub(super) fn proxy_usage_numbers"), true);
+  assert.equal(metricsSource.includes("pub(super) fn proxy_cache_tokens"), true);
+  assert.equal(metricsSource.includes("pub(super) fn proxy_cache_creation_tokens"), true);
+  assert.equal(metricsSource.includes("pub(super) struct StreamingUsageAccumulator"), true);
+  assert.equal(proxySource.includes("fn proxy_usage_numbers(usage: &Value)"), false);
+  assert.equal(proxySource.includes("fn proxy_cache_tokens(usage: &Value)"), false);
+});
+
 test("private core migrates legacy app state before startup import", () => {
   const privateCore = readSource("../.private/agent-switch-private-core/src-tauri-core/src/lib.rs");
   const loadAppStateStart = privateCore.indexOf("fn load_app_state()");
