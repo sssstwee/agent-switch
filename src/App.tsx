@@ -190,6 +190,7 @@ import {
 import { AddressVariantSwitch } from "./components/AddressVariantSwitch.tsx";
 import { GatewayRequirementIcon } from "./components/GatewayRequirementIcon.tsx";
 import { ModelDiscoveryField } from "./components/ModelDiscoveryField.tsx";
+import { OfficialCodexModelField } from "./components/OfficialCodexModelField.tsx";
 import { OneMillionContextField } from "./components/OneMillionContextField.tsx";
 import {
   GatewayPage,
@@ -2293,48 +2294,23 @@ function App() {
   function renderOfficialCodexModelField() {
     if (!isOfficialCodexDirect) return null;
     const value = addForm.model || addForm.model_map.main || "gpt-5.5";
+    const handleModelChange = (nextModel: string) => {
+      setAddForm((form) => ({
+        ...form,
+        model: nextModel,
+        config_toml: mergeCodexOfficialModelIntoToml(form.config_toml, nextModel),
+        model_map: defaultModelMap(nextModel),
+        provider_model_map: defaultModelMap(nextModel),
+      }));
+    };
     return (
-      <div className="ccr-edit-field">
-        <label>默认模型</label>
-        <Input
-          placeholder={currentSelectedPreset?.model_map.main || "gpt-5.5"}
-          value={value}
-          onChange={(e) => {
-            const nextModel = e.currentTarget.value;
-            setAddForm((form) => ({
-              ...form,
-              model: nextModel,
-              config_toml: mergeCodexOfficialModelIntoToml(form.config_toml, nextModel),
-              model_map: defaultModelMap(nextModel),
-              provider_model_map: defaultModelMap(nextModel),
-            }));
-          }}
-        />
-        {providerModelCandidates.length > 0 ? (
-          <div className="ccr-model-candidates" aria-label="官方模型候选">
-            {providerModelCandidates.map((model) => (
-              <button
-                key={model}
-                type="button"
-                className={value === model ? "ccr-model-candidate active" : "ccr-model-candidate"}
-                onClick={() =>
-                  setAddForm((form) => ({
-                    ...form,
-                    model,
-                    config_toml: mergeCodexOfficialModelIntoToml(form.config_toml, model),
-                    model_map: defaultModelMap(model),
-                    provider_model_map: defaultModelMap(model),
-                  }))
-                }
-                title={model}
-              >
-                {model}
-              </button>
-            ))}
-          </div>
-        ) : null}
-        <span className="ccr-field-help">该模型会写入官方 config.toml 的 model 字段；实际可用性仍以当前 ChatGPT 账号计划和额度为准。</span>
-      </div>
+      <OfficialCodexModelField
+        value={value}
+        placeholder={currentSelectedPreset?.model_map.main || "gpt-5.5"}
+        providerModelCandidates={providerModelCandidates}
+        onChange={handleModelChange}
+        onSelectCandidate={handleModelChange}
+      />
     );
   }
 
