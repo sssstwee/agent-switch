@@ -131,8 +131,6 @@ import {
   presetModeKey,
   presetModeLabel,
   presetModesForFamily,
-  presetRegionKey,
-  presetRegionLabel,
   selectedPresetById,
 } from "./profilePresetUtils.ts";
 import {
@@ -191,6 +189,7 @@ import {
   TargetLogo,
   VendorLogo,
 } from "./components/AppUiPrimitives.tsx";
+import { AddressVariantSwitch } from "./components/AddressVariantSwitch.tsx";
 import { OneMillionContextField } from "./components/OneMillionContextField.tsx";
 import {
   GatewayPage,
@@ -2259,31 +2258,13 @@ function App() {
       ? `写入 ${currentTargetMeta.configFileLabel}`
       : "暂不支持写入该客户端配置";
   function renderAddressVariantSwitch() {
-    if (currentAddressVariantPresets.length < 2 || !currentSelectedPreset || isEditingProfile) return null;
-
     return (
-      <div className="ccr-address-radio-group" role="radiogroup" aria-label="请求地址类型">
-        {currentAddressVariantPresets.map((preset) => {
-          const region = presetRegionKey(preset);
-          if (!region) return null;
-          const isActive = selectedPreset === preset.id;
-
-          return (
-            <button
-              key={preset.id}
-              type="button"
-              role="radio"
-              aria-checked={isActive}
-              className={`ccr-address-radio${isActive ? " active" : ""}`}
-              onClick={() => selectPreset(preset)}
-              title={preset.description}
-            >
-              <span className="ccr-address-radio-dot" aria-hidden="true" />
-              {presetRegionLabel(region)}
-            </button>
-          );
-        })}
-      </div>
+      <AddressVariantSwitch
+        presets={currentAddressVariantPresets}
+        selectedPresetId={selectedPreset}
+        onSelect={selectPreset}
+        disabled={!currentSelectedPreset || isEditingProfile}
+      />
     );
   }
 
