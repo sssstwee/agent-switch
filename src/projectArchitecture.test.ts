@@ -55,6 +55,7 @@ test("public branding uses Switch++ naming", () => {
   assert.equal(tauriConfig.app.trayIcon.tooltip, "Switch++");
   assert.equal(tauriConfig.app.trayIcon.iconAsTemplate, true);
   assert.deepEqual(tauriConfig.bundle.resources, ["icons/32x32.png"]);
+  assert.match(cargoToml, /features = \[ "tray-icon", "image-png"\]/);
   assert.equal(packageJson.scripts.dev, "tauri dev --runner ../scripts/tauri-dev-runner.sh");
   assert.match(cargoToml, /^name = "switchpp"$/m);
   assert.match(cargoToml, /^name = "agent_switch_lib"$/m);
@@ -118,6 +119,16 @@ test("Tauri build script reruns when app icons change", () => {
   assert.equal(buildRs.includes("cargo:rerun-if-changed=icons/icon.png"), true);
   assert.equal(buildRs.includes("cargo:rerun-if-changed=icons/icon.icns"), true);
   assert.equal(buildRs.includes("cargo:rerun-if-changed=icons/icon.ico"), true);
+});
+
+test("macOS tray icon is explicitly installed as a template image", () => {
+  const appShell = readSource("../.private/agent-switch-private-core/src-tauri-core/src/app_shell.rs");
+
+  assert.equal(appShell.includes("include_bytes!(concat!(env!(\"CARGO_MANIFEST_DIR\"), \"/icons/32x32.png\"))"), true);
+  assert.equal(appShell.includes("fn bundled_tray_icon()"), true);
+  assert.equal(appShell.includes("set_icon_with_as_template(Some(icon), true)"), true);
+  assert.equal(appShell.includes(".icon_as_template(true)"), true);
+  assert.equal(appShell.includes(".tooltip(TRAY_TOOLTIP)"), true);
 });
 
 test("App delegates gateway snapshot assembly to GatewayPage module", () => {

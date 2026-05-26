@@ -544,8 +544,11 @@ function App() {
     if (view !== "gateway") return;
     let disposed = false;
     let removeProxyEventListener: (() => void) | null = null;
+    let visibilityHandler: (() => void) | null = null;
+    let timer: number | null = null;
 
     const refreshProxyStatus = () => {
+      if (document.visibilityState === "hidden") return;
       void nativeApi.codexProxyStatus().then(setCodexProxyStatus).catch(() => undefined);
       if (codexProxyDetailTab === "overview" || codexProxyDetailTab === "detail") {
         const selectedTarget = resolveGatewaySelectedTarget();
@@ -561,9 +564,33 @@ function App() {
       }
     };
 
+    const startPolling = () => {
+      if (timer !== null) window.clearInterval(timer);
+      timer = window.setInterval(refreshProxyStatus, 15000);
+    };
+
+    const stopPolling = () => {
+      if (timer !== null) {
+        window.clearInterval(timer);
+        timer = null;
+      }
+    };
+
     refreshProxyStatus();
+    startPolling();
+
+    visibilityHandler = () => {
+      if (document.visibilityState === "visible") {
+        refreshProxyStatus();
+        startPolling();
+      } else {
+        stopPolling();
+      }
+    };
+    document.addEventListener("visibilitychange", visibilityHandler);
+
     void listen("codex-proxy-call-recorded", () => {
-      if (!disposed) refreshProxyStatus();
+      if (!disposed && document.visibilityState === "visible") refreshProxyStatus();
     })
       .then((unlisten) => {
         if (disposed) {
@@ -573,11 +600,11 @@ function App() {
         }
       })
       .catch(() => undefined);
-    const timer = window.setInterval(refreshProxyStatus, 15000);
 
     return () => {
       disposed = true;
-      window.clearInterval(timer);
+      stopPolling();
+      if (visibilityHandler) document.removeEventListener("visibilitychange", visibilityHandler);
       removeProxyEventListener?.();
     };
   }, [

@@ -8,11 +8,10 @@ import type {
   CodexProxyStatus,
 } from "../appTypes.ts";
 import type { ProxyTargetKey } from "../proxyTargets.ts";
+import { resolveValue, type StateUpdater } from "./stateUpdater.ts";
 
 export type GatewayDetailTab = "overview" | "basic" | "detail";
 export type GatewayCallPageSize = 20 | 50 | 100;
-
-type StateUpdater<T> = T | ((current: T) => T);
 
 type GatewayStore = {
   codexProxyStatus: CodexProxyStatus | null;
@@ -70,7 +69,7 @@ export const useGatewayStore = create<GatewayStore>((set) => ({
   setCodexProxyCallPageSize: (codexProxyCallPageSize) => set({ codexProxyCallPageSize }),
   setCodexProxyExpandedCallId: (codexProxyExpandedCallId) => set({ codexProxyExpandedCallId }),
   setCodexProxyCallDetails: (value) => set((state) => ({
-    codexProxyCallDetails: typeof value === "function" ? value(state.codexProxyCallDetails) : value,
+    codexProxyCallDetails: resolveValue(value, state.codexProxyCallDetails),
   })),
   setCodexProxyBusy: (codexProxyBusy) => set({ codexProxyBusy }),
   resetGatewayHistoryView: () => set({

@@ -1,9 +1,8 @@
 import { create } from "zustand";
 import type { TargetKey } from "../appTypes.ts";
+import { resolveValue, type StateUpdater } from "./stateUpdater.ts";
 
 export type AppView = "list" | "add" | "env" | "overview" | "switch" | "mcp" | "gateway";
-
-type StateUpdater<T> = T | ((current: T) => T);
 
 type AppUiStore = {
   target: TargetKey;
@@ -25,10 +24,6 @@ type AppUiStore = {
   setCodexConfigOpen: (value: StateUpdater<boolean>) => void;
   setDesktopEffectiveConfigOpen: (value: StateUpdater<boolean>) => void;
 };
-
-function resolveValue<T>(value: StateUpdater<T>, current: T) {
-  return typeof value === "function" ? (value as (current: T) => T)(current) : value;
-}
 
 export const useAppUiStore = create<AppUiStore>((set) => ({
   target: "codex",

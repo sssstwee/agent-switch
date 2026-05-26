@@ -131,46 +131,25 @@ const codingPresets: VendorPreset[] = [
 const customPresets: VendorPreset[] = [customPreset];
 export const allVendorPresets = [...customPresets, ...domesticPresets, ...internationalPresets, ...codingPresets];
 
-type VendorTargetAdapter = {
-  base_url?: string;
-  api_format?: ApiFormat;
-  auth_field?: AuthField;
-  source_url: string;
-};
+import {
+  makeAnthropicCompatAdapters,
+  makeBailianAdapters,
+  makeBailianCodingAdapters,
+  makeKimiAdapters,
+  makeMinimaxAdapters,
+  makeOpenaiCompatAdapters,
+  makeZaiAdapters,
+  makeZaiCodingAdapters,
+  mergeAdapters,
+  repeatAdapter,
+  type VendorTargetAdapter,
+} from "./vendorTargetAdapterFactory.ts";
 
 const vendorTargetAdapters: Partial<Record<string, Partial<Record<TargetKey, VendorTargetAdapter>>>> = {
-  openai: {
-    opencode: {
-      base_url: "https://api.openai.com/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.openai.com/docs/api-reference/chat/create",
-    },
-    oh_my_opencode: {
-      base_url: "https://api.openai.com/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.openai.com/docs/api-reference/chat/create",
-    },
-    openclaw: {
-      base_url: "https://api.openai.com/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.openai.com/docs/api-reference/chat/create",
-    },
-    hermes: {
-      base_url: "https://api.openai.com/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.openai.com/docs/api-reference/chat/create",
-    },
-    pi: {
-      base_url: "https://api.openai.com/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.openai.com/docs/api-reference/chat/create",
-    },
-    oh_my_pi: {
-      base_url: "https://api.openai.com/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.openai.com/docs/api-reference/chat/create",
-    },
-  },
+  openai: makeOpenaiCompatAdapters(
+    "https://api.openai.com/v1",
+    "https://platform.openai.com/docs/api-reference/chat/create",
+  ),
   google: {
     hermes: {
       base_url: "https://generativelanguage.googleapis.com/v1beta",
@@ -179,631 +158,96 @@ const vendorTargetAdapters: Partial<Record<string, Partial<Record<TargetKey, Ven
       source_url: "https://hermes-agent.nousresearch.com/docs/guides/google-gemini",
     },
   },
-  deepseek: {
-    claude_cli: {
-      base_url: "https://api.deepseek.com/anthropic",
-      api_format: "anthropic",
-      source_url: "https://api-docs.deepseek.com/guides/agent_integrations/claude_code",
-    },
-    claude_desktop: {
-      base_url: "https://api.deepseek.com/anthropic",
-      api_format: "anthropic",
-      source_url: "https://api-docs.deepseek.com/guides/agent_integrations/claude_code",
-    },
-    opencode: {
-      base_url: "https://api.deepseek.com",
-      api_format: "openai_chat",
-      source_url: "https://api-docs.deepseek.com/quick_start/agent_integrations/opencode",
-    },
-    oh_my_opencode: {
-      base_url: "https://api.deepseek.com",
-      api_format: "openai_chat",
-      source_url: "https://api-docs.deepseek.com/",
-    },
-    openclaw: {
-      base_url: "https://api.deepseek.com",
-      api_format: "openai_chat",
-      source_url: "https://api-docs.deepseek.com/quick_start/agent_integrations/openclaw",
-    },
-    hermes: {
-      base_url: "https://api.deepseek.com",
-      api_format: "openai_chat",
-      source_url: "https://api-docs.deepseek.com/quick_start/agent_integrations/hermes",
-    },
-    pi: {
-      base_url: "https://api.deepseek.com",
-      api_format: "openai_chat",
-      source_url: "https://api-docs.deepseek.com/quick_start/agent_integrations/pi_mono",
-    },
-    oh_my_pi: {
-      base_url: "https://api.deepseek.com",
-      api_format: "openai_chat",
-      source_url: "https://api-docs.deepseek.com/quick_start/agent_integrations/oh_my_pi",
-    },
-  },
-  "kimi-code": {
-    claude_cli: {
-      base_url: "https://api.kimi.com/coding/",
-      api_format: "anthropic",
-      source_url: "https://www.kimi.com/code/docs/en/third-party-tools/other-coding-agents.html",
-    },
-    claude_desktop: {
-      base_url: "https://api.kimi.com/coding/",
-      api_format: "anthropic",
-      source_url: "https://www.kimi.com/code/docs/en/third-party-tools/other-coding-agents.html",
-    },
-    opencode: {
-      base_url: "https://api.kimi.com/coding/v1",
-      api_format: "openai_chat",
-      source_url: "https://www.kimi.com/code/docs/en/",
-    },
-    oh_my_opencode: {
-      base_url: "https://api.kimi.com/coding/v1",
-      api_format: "openai_chat",
-      source_url: "https://www.kimi.com/code/docs/en/",
-    },
-    openclaw: {
-      base_url: "https://api.kimi.com/coding/v1",
-      api_format: "openai_chat",
-      source_url: "https://www.kimi.com/code/docs/en/third-party-tools/other-coding-agents.html",
-    },
-    hermes: {
-      base_url: "https://api.kimi.com/coding/",
-      api_format: "anthropic",
-      source_url: "https://www.kimi.com/code/docs/en/",
-    },
-    pi: {
-      base_url: "https://api.kimi.com/coding/v1",
-      api_format: "openai_chat",
-      source_url: "https://www.kimi.com/code/docs/en/third-party-tools/other-coding-agents.html",
-    },
-    oh_my_pi: {
-      base_url: "https://api.kimi.com/coding/v1",
-      api_format: "openai_chat",
-      source_url: "https://www.kimi.com/code/docs/en/third-party-tools/other-coding-agents.html",
-    },
-  },
-  "kimi-cn": {
-    opencode: {
-      base_url: "https://api.moonshot.cn/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.kimi.ai/docs/api/overview",
-    },
-    oh_my_opencode: {
-      base_url: "https://api.moonshot.cn/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.kimi.ai/docs/api/overview",
-    },
-    openclaw: {
-      base_url: "https://api.moonshot.cn/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.kimi.ai/docs/api/overview",
-    },
-    hermes: {
-      base_url: "https://api.moonshot.cn/v1",
-      api_format: "openai_chat",
-      source_url: "https://hermes-agent.nousresearch.com/docs/integrations/providers",
-    },
-    pi: {
-      base_url: "https://api.moonshot.cn/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.kimi.ai/docs/api/overview",
-    },
-    oh_my_pi: {
-      base_url: "https://api.moonshot.cn/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.kimi.ai/docs/api/overview",
-    },
-  },
-  "kimi-global": {
-    opencode: {
-      base_url: "https://api.moonshot.ai/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.kimi.ai/docs/api/overview",
-    },
-    oh_my_opencode: {
-      base_url: "https://api.moonshot.ai/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.kimi.ai/docs/api/overview",
-    },
-    openclaw: {
-      base_url: "https://api.moonshot.ai/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.kimi.ai/docs/api/overview",
-    },
-    hermes: {
-      base_url: "https://api.moonshot.ai/v1",
-      api_format: "openai_chat",
-      source_url: "https://hermes-agent.nousresearch.com/docs/integrations/providers",
-    },
-    pi: {
-      base_url: "https://api.moonshot.ai/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.kimi.ai/docs/api/overview",
-    },
-    oh_my_pi: {
-      base_url: "https://api.moonshot.ai/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.kimi.ai/docs/api/overview",
-    },
-  },
-  "glm-cn": {
-    opencode: {
-      base_url: "https://open.bigmodel.cn/api/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://docs.bigmodel.cn/cn/guide/develop/openai/introduction",
-    },
-    oh_my_opencode: {
-      base_url: "https://open.bigmodel.cn/api/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://docs.bigmodel.cn/cn/guide/develop/openai/introduction",
-    },
-    openclaw: {
-      base_url: "https://open.bigmodel.cn/api/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://docs.bigmodel.cn/cn/guide/develop/openai/introduction",
-    },
-    hermes: {
-      base_url: "https://open.bigmodel.cn/api/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://hermes-agent.nousresearch.com/docs/integrations/providers",
-    },
-    pi: {
-      base_url: "https://open.bigmodel.cn/api/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://docs.bigmodel.cn/cn/guide/develop/openai/introduction",
-    },
-    oh_my_pi: {
-      base_url: "https://open.bigmodel.cn/api/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://docs.bigmodel.cn/cn/guide/develop/openai/introduction",
-    },
-  },
-  "zai-global": {
-    opencode: {
-      base_url: "https://api.z.ai/api/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://docs.z.ai/api-reference/introduction",
-    },
-    oh_my_opencode: {
-      base_url: "https://api.z.ai/api/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://docs.z.ai/api-reference/introduction",
-    },
-    openclaw: {
-      base_url: "https://api.z.ai/api/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://docs.z.ai/api-reference/introduction",
-    },
-    hermes: {
-      base_url: "https://api.z.ai/api/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://hermes-agent.nousresearch.com/docs/integrations/providers",
-    },
-    pi: {
-      base_url: "https://api.z.ai/api/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://docs.z.ai/api-reference/introduction",
-    },
-    oh_my_pi: {
-      base_url: "https://api.z.ai/api/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://docs.z.ai/api-reference/introduction",
-    },
-  },
-  modelscope: {
-    opencode: {
-      base_url: "https://api-inference.modelscope.cn/v1",
-      api_format: "openai_chat",
-      source_url: "https://modelscope.cn/docs/model-service/API-Inference/intro",
-    },
-    oh_my_opencode: {
-      base_url: "https://api-inference.modelscope.cn/v1",
-      api_format: "openai_chat",
-      source_url: "https://modelscope.cn/docs/model-service/API-Inference/intro",
-    },
-    openclaw: {
-      base_url: "https://api-inference.modelscope.cn/v1",
-      api_format: "openai_chat",
-      source_url: "https://modelscope.cn/docs/model-service/API-Inference/intro",
-    },
-    hermes: {
-      base_url: "https://api-inference.modelscope.cn/v1",
-      api_format: "openai_chat",
-      source_url: "https://modelscope.cn/docs/model-service/API-Inference/intro",
-    },
-    pi: {
-      base_url: "https://api-inference.modelscope.cn/v1",
-      api_format: "openai_chat",
-      source_url: "https://modelscope.cn/docs/model-service/API-Inference/intro",
-    },
-    oh_my_pi: {
-      base_url: "https://api-inference.modelscope.cn/v1",
-      api_format: "openai_chat",
-      source_url: "https://modelscope.cn/docs/model-service/API-Inference/intro",
-    },
-  },
-  "minimax-cn": {
-    claude_cli: {
-      base_url: "https://api.minimaxi.com/anthropic",
-      api_format: "anthropic",
-      source_url: "https://platform.minimax.io/docs/token-plan/claude-code",
-    },
-    claude_desktop: {
-      base_url: "https://api.minimaxi.com/anthropic",
-      api_format: "anthropic",
-      source_url: "https://platform.minimax.io/docs/token-plan/claude-code",
-    },
-    opencode: {
-      base_url: "https://api.minimaxi.com/anthropic/v1",
-      api_format: "anthropic",
-      source_url: "https://platform.minimax.io/docs/guides/text-ai-coding-tools",
-    },
-    oh_my_opencode: {
-      base_url: "https://api.minimaxi.com/anthropic/v1",
-      api_format: "anthropic",
-      source_url: "https://platform.minimax.io/docs/guides/text-ai-coding-tools",
-    },
-    hermes: {
-      base_url: "https://api.minimaxi.com/anthropic",
-      api_format: "anthropic",
-      source_url: "https://hermes-agent.nousresearch.com/docs/guides/minimax-oauth",
-    },
-    openclaw: {
-      base_url: "https://api.minimaxi.com/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.minimax.io/docs/api-reference/text-openai-api",
-    },
-    pi: {
-      base_url: "https://api.minimaxi.com/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.minimax.io/docs/api-reference/text-openai-api",
-    },
-    oh_my_pi: {
-      base_url: "https://api.minimaxi.com/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.minimax.io/docs/api-reference/text-openai-api",
-    },
-  },
-  "minimax-global": {
-    claude_cli: {
-      base_url: "https://api.minimax.io/anthropic",
-      api_format: "anthropic",
-      source_url: "https://platform.minimax.io/docs/token-plan/claude-code",
-    },
-    claude_desktop: {
-      base_url: "https://api.minimax.io/anthropic",
-      api_format: "anthropic",
-      source_url: "https://platform.minimax.io/docs/token-plan/claude-code",
-    },
-    opencode: {
-      base_url: "https://api.minimax.io/anthropic/v1",
-      api_format: "anthropic",
-      source_url: "https://platform.minimax.io/docs/guides/text-ai-coding-tools",
-    },
-    oh_my_opencode: {
-      base_url: "https://api.minimax.io/anthropic/v1",
-      api_format: "anthropic",
-      source_url: "https://platform.minimax.io/docs/guides/text-ai-coding-tools",
-    },
-    hermes: {
-      base_url: "https://api.minimax.io/anthropic",
-      api_format: "anthropic",
-      source_url: "https://hermes-agent.nousresearch.com/docs/guides/minimax-oauth",
-    },
-    openclaw: {
-      base_url: "https://api.minimax.io/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.minimax.io/docs/api-reference/text-openai-api",
-    },
-    pi: {
-      base_url: "https://api.minimax.io/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.minimax.io/docs/api-reference/text-openai-api",
-    },
-    oh_my_pi: {
-      base_url: "https://api.minimax.io/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.minimax.io/docs/api-reference/text-openai-api",
-    },
-  },
-  "minimax-coding-cn": {
-    claude_cli: {
-      base_url: "https://api.minimaxi.com/anthropic",
-      api_format: "anthropic",
-      source_url: "https://platform.minimax.io/docs/token-plan/claude-code",
-    },
-    claude_desktop: {
-      base_url: "https://api.minimaxi.com/anthropic",
-      api_format: "anthropic",
-      source_url: "https://platform.minimax.io/docs/token-plan/claude-code",
-    },
-    opencode: {
-      base_url: "https://api.minimaxi.com/anthropic/v1",
-      api_format: "anthropic",
-      source_url: "https://platform.minimax.io/docs/guides/text-ai-coding-tools",
-    },
-    oh_my_opencode: {
-      base_url: "https://api.minimaxi.com/anthropic/v1",
-      api_format: "anthropic",
-      source_url: "https://platform.minimax.io/docs/guides/text-ai-coding-tools",
-    },
-    hermes: {
-      base_url: "https://api.minimaxi.com/anthropic",
-      api_format: "anthropic",
-      source_url: "https://hermes-agent.nousresearch.com/docs/guides/minimax-oauth",
-    },
-    openclaw: {
-      base_url: "https://api.minimaxi.com/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.minimax.io/docs/api-reference/text-openai-api",
-    },
-    pi: {
-      base_url: "https://api.minimaxi.com/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.minimax.io/docs/api-reference/text-openai-api",
-    },
-    oh_my_pi: {
-      base_url: "https://api.minimaxi.com/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.minimax.io/docs/api-reference/text-openai-api",
-    },
-  },
-  "minimax-coding-global": {
-    claude_cli: {
-      base_url: "https://api.minimax.io/anthropic",
-      api_format: "anthropic",
-      source_url: "https://platform.minimax.io/docs/token-plan/claude-code",
-    },
-    claude_desktop: {
-      base_url: "https://api.minimax.io/anthropic",
-      api_format: "anthropic",
-      source_url: "https://platform.minimax.io/docs/token-plan/claude-code",
-    },
-    opencode: {
-      base_url: "https://api.minimax.io/anthropic/v1",
-      api_format: "anthropic",
-      source_url: "https://platform.minimax.io/docs/guides/text-ai-coding-tools",
-    },
-    oh_my_opencode: {
-      base_url: "https://api.minimax.io/anthropic/v1",
-      api_format: "anthropic",
-      source_url: "https://platform.minimax.io/docs/guides/text-ai-coding-tools",
-    },
-    hermes: {
-      base_url: "https://api.minimax.io/anthropic",
-      api_format: "anthropic",
-      source_url: "https://hermes-agent.nousresearch.com/docs/guides/minimax-oauth",
-    },
-    openclaw: {
-      base_url: "https://api.minimax.io/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.minimax.io/docs/api-reference/text-openai-api",
-    },
-    pi: {
-      base_url: "https://api.minimax.io/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.minimax.io/docs/api-reference/text-openai-api",
-    },
-    oh_my_pi: {
-      base_url: "https://api.minimax.io/v1",
-      api_format: "openai_chat",
-      source_url: "https://platform.minimax.io/docs/api-reference/text-openai-api",
-    },
-  },
-  siliconflow: {
-    claude_cli: {
-      base_url: "https://api.siliconflow.cn",
-      api_format: "anthropic",
-      source_url: "https://docs.siliconflow.cn/en/usercases/use-siliconcloud-in-ccswitch",
-    },
-    claude_desktop: {
-      base_url: "https://api.siliconflow.cn",
-      api_format: "anthropic",
-      source_url: "https://docs.siliconflow.cn/en/usercases/use-siliconcloud-in-ccswitch",
-    },
-    opencode: {
-      base_url: "https://api.siliconflow.cn/v1",
-      api_format: "openai_chat",
-      source_url: "https://docs.siliconflow.com/en/usercases/how-to-use-opencode-with-siliconflow-apis",
-    },
-    oh_my_opencode: {
+  deepseek: mergeAdapters(
+    makeAnthropicCompatAdapters(
+      "https://api.deepseek.com/anthropic",
+      "https://api-docs.deepseek.com/guides/agent_integrations/claude_code",
+    ),
+    {
+      opencode: {
+        base_url: "https://api.deepseek.com",
+        api_format: "openai_chat",
+        source_url: "https://api-docs.deepseek.com/quick_start/agent_integrations/opencode",
+      },
+      oh_my_opencode: {
+        base_url: "https://api.deepseek.com",
+        api_format: "openai_chat",
+        source_url: "https://api-docs.deepseek.com/",
+      },
+      openclaw: {
+        base_url: "https://api.deepseek.com",
+        api_format: "openai_chat",
+        source_url: "https://api-docs.deepseek.com/quick_start/agent_integrations/openclaw",
+      },
+      hermes: {
+        base_url: "https://api.deepseek.com",
+        api_format: "openai_chat",
+        source_url: "https://api-docs.deepseek.com/quick_start/agent_integrations/hermes",
+      },
+      pi: {
+        base_url: "https://api.deepseek.com",
+        api_format: "openai_chat",
+        source_url: "https://api-docs.deepseek.com/quick_start/agent_integrations/pi_mono",
+      },
+      oh_my_pi: {
+        base_url: "https://api.deepseek.com",
+        api_format: "openai_chat",
+        source_url: "https://api-docs.deepseek.com/quick_start/agent_integrations/oh_my_pi",
+      },
+    },
+  ),
+  "kimi-code": makeKimiAdapters("kimi.com", "coding"),
+  "kimi-cn": makeOpenaiCompatAdapters(
+    "https://api.moonshot.cn/v1",
+    "https://platform.kimi.ai/docs/api/overview",
+  ),
+  "kimi-global": makeOpenaiCompatAdapters(
+    "https://api.moonshot.ai/v1",
+    "https://platform.kimi.ai/docs/api/overview",
+  ),
+  "glm-cn": makeOpenaiCompatAdapters(
+    "https://open.bigmodel.cn/api/paas/v4",
+    "https://docs.bigmodel.cn/cn/guide/develop/openai/introduction",
+  ),
+  "zai-global": makeZaiAdapters("https://api.z.ai", "https://docs.z.ai"),
+  modelscope: makeOpenaiCompatAdapters(
+    "https://api-inference.modelscope.cn/v1",
+    "https://modelscope.cn/docs/model-service/API-Inference/intro",
+  ),
+  "minimax-cn": makeMinimaxAdapters("minimaxi.com"),
+  "minimax-global": makeMinimaxAdapters("minimax.io"),
+  "minimax-coding-cn": makeMinimaxAdapters("minimaxi.com"),
+  "minimax-coding-global": makeMinimaxAdapters("minimax.io"),
+  siliconflow: mergeAdapters(
+    makeAnthropicCompatAdapters(
+      "https://api.siliconflow.cn",
+      "https://docs.siliconflow.cn/en/usercases/use-siliconcloud-in-ccswitch",
+    ),
+    repeatAdapter(["opencode", "oh_my_opencode", "openclaw", "hermes", "pi", "oh_my_pi"], {
       base_url: "https://api.siliconflow.cn/v1",
       api_format: "openai_chat",
       source_url: "https://docs.siliconflow.cn/en/usercases/use-siliconcloud-in-ccswitch",
-    },
-    openclaw: {
-      base_url: "https://api.siliconflow.cn/v1",
-      api_format: "openai_chat",
-      source_url: "https://docs.siliconflow.cn/cn/usercases/use-siliconcloud-in-OpenClaw",
-    },
-    hermes: {
-      base_url: "https://api.siliconflow.cn/v1",
-      api_format: "openai_chat",
-      source_url: "https://docs.siliconflow.cn/cn/usercases/use-siliconcloud-in-ccswitch",
-    },
-    pi: {
-      base_url: "https://api.siliconflow.cn/v1",
-      api_format: "openai_chat",
-      source_url: "https://docs.siliconflow.cn/en/usercases/use-siliconcloud-in-ccswitch",
-    },
-    oh_my_pi: {
-      base_url: "https://api.siliconflow.cn/v1",
-      api_format: "openai_chat",
-      source_url: "https://docs.siliconflow.cn/en/usercases/use-siliconcloud-in-ccswitch",
-    },
-  },
-  openrouter: {
-    claude_cli: {
-      base_url: "https://openrouter.ai/api",
-      api_format: "anthropic",
-      source_url: "https://openrouter.ai/docs/api/api-reference/anthropic-messages/create-messages",
-    },
-    claude_desktop: {
-      base_url: "https://openrouter.ai/api",
-      api_format: "anthropic",
-      source_url: "https://openrouter.ai/docs/api/api-reference/anthropic-messages/create-messages",
-    },
-    opencode: {
-      base_url: "https://openrouter.ai/api/v1",
-      api_format: "openai_chat",
-      source_url: "https://openrouter.ai/docs/api/reference/overview/",
-    },
-    oh_my_opencode: {
-      base_url: "https://openrouter.ai/api/v1",
-      api_format: "openai_chat",
-      source_url: "https://openrouter.ai/docs/api/reference/overview/",
-    },
-    openclaw: {
-      base_url: "https://openrouter.ai/api/v1",
-      api_format: "openai_chat",
-      source_url: "https://openrouter.ai/docs/api/reference/overview/",
-    },
-    hermes: {
-      base_url: "https://openrouter.ai/api/v1",
-      api_format: "openai_chat",
-      source_url: "https://hermes-agent.nousresearch.com/docs/integrations/providers",
-    },
-    pi: {
-      base_url: "https://openrouter.ai/api/v1",
-      api_format: "openai_chat",
-      source_url: "https://openrouter.ai/docs/api/reference/overview/",
-    },
-    oh_my_pi: {
-      base_url: "https://openrouter.ai/api/v1",
-      api_format: "openai_chat",
-      source_url: "https://openrouter.ai/docs/api/reference/overview/",
-    },
-  },
-  "zai-coding": {
-    opencode: {
-      base_url: "https://api.z.ai/api/coding/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://docs.z.ai/devpack/tool/opencode",
-    },
-    oh_my_opencode: {
-      base_url: "https://api.z.ai/api/coding/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://docs.z.ai/devpack/faq",
-    },
-    openclaw: {
-      base_url: "https://api.z.ai/api/coding/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://docs.z.ai/devpack/tool/openclaw",
-    },
-    hermes: {
-      base_url: "https://api.z.ai/api/coding/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://hermes-agent.nousresearch.com/docs/integrations/providers",
-    },
-    pi: {
-      base_url: "https://api.z.ai/api/coding/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://docs.z.ai/devpack/faq",
-    },
-    oh_my_pi: {
-      base_url: "https://api.z.ai/api/coding/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://docs.z.ai/devpack/faq",
-    },
-  },
-  "zai-coding-cn": {
-    opencode: {
-      base_url: "https://open.bigmodel.cn/api/coding/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://docs.bigmodel.cn/cn/coding-plan/tool/opencode",
-    },
-    oh_my_opencode: {
-      base_url: "https://open.bigmodel.cn/api/coding/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://docs.bigmodel.cn/cn/coding-plan/tool/others",
-    },
-    openclaw: {
-      base_url: "https://open.bigmodel.cn/api/coding/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://docs.bigmodel.cn/cn/coding-plan/tool/openclaw",
-    },
-    hermes: {
-      base_url: "https://open.bigmodel.cn/api/coding/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://hermes-agent.nousresearch.com/docs/integrations/providers",
-    },
-    pi: {
-      base_url: "https://open.bigmodel.cn/api/coding/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://docs.bigmodel.cn/cn/coding-plan/tool/others",
-    },
-    oh_my_pi: {
-      base_url: "https://open.bigmodel.cn/api/coding/paas/v4",
-      api_format: "openai_chat",
-      source_url: "https://docs.bigmodel.cn/cn/coding-plan/tool/others",
-    },
-  },
-  bailian: {
-    opencode: {
-      base_url: "https://dashscope.aliyuncs.com/apps/anthropic/v1",
-      api_format: "anthropic",
-      source_url: "https://help.aliyun.com/zh/model-studio/opencode",
-    },
-    oh_my_opencode: {
-      base_url: "https://dashscope.aliyuncs.com/apps/anthropic/v1",
-      api_format: "anthropic",
-      source_url: "https://help.aliyun.com/zh/model-studio/opencode",
-    },
-    openclaw: {
-      base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1",
-      api_format: "openai_chat",
-      source_url: "https://help.aliyun.com/zh/model-studio/openclaw",
-    },
-    hermes: {
-      base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1",
-      api_format: "openai_chat",
-      source_url: "https://help.aliyun.com/zh/model-studio/hermes-agent",
-    },
-    pi: {
-      base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1",
-      api_format: "openai_chat",
-      source_url: "https://help.aliyun.com/zh/model-studio/qwen-code",
-    },
-    oh_my_pi: {
-      base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1",
-      api_format: "openai_chat",
-      source_url: "https://help.aliyun.com/zh/model-studio/qwen-code",
-    },
-  },
-  "bailian-coding": {
-    opencode: {
-      base_url: "https://coding.dashscope.aliyuncs.com/apps/anthropic/v1",
-      api_format: "anthropic",
-      source_url: "https://help.aliyun.com/zh/model-studio/opencode",
-    },
-    oh_my_opencode: {
-      base_url: "https://coding.dashscope.aliyuncs.com/apps/anthropic/v1",
-      api_format: "anthropic",
-      source_url: "https://help.aliyun.com/zh/model-studio/opencode",
-    },
-    openclaw: {
-      base_url: "https://coding.dashscope.aliyuncs.com/v1",
-      api_format: "openai_chat",
-      source_url: "https://help.aliyun.com/zh/model-studio/coding-plan-faq",
-    },
-    hermes: {
-      base_url: "https://coding.dashscope.aliyuncs.com/v1",
-      api_format: "openai_chat",
-      source_url: "https://help.aliyun.com/zh/model-studio/hermes-agent",
-    },
-    pi: {
-      base_url: "https://coding.dashscope.aliyuncs.com/v1",
-      api_format: "openai_chat",
-      source_url: "https://help.aliyun.com/zh/model-studio/qwen-code",
-    },
-    oh_my_pi: {
-      base_url: "https://coding.dashscope.aliyuncs.com/v1",
-      api_format: "openai_chat",
-      source_url: "https://help.aliyun.com/zh/model-studio/qwen-code",
-    },
-  },
+    }),
+  ),
+  openrouter: mergeAdapters(
+    makeAnthropicCompatAdapters(
+      "https://openrouter.ai/api",
+      "https://openrouter.ai/docs/api/api-reference/anthropic-messages/create-messages",
+    ),
+    makeOpenaiCompatAdapters(
+      "https://openrouter.ai/api/v1",
+      "https://openrouter.ai/docs/api/reference/overview/",
+    ),
+  ),
+  "zai-coding": makeZaiCodingAdapters("https://api.z.ai", "https://docs.z.ai"),
+  "zai-coding-cn": makeZaiCodingAdapters("https://open.bigmodel.cn", "https://docs.bigmodel.cn/cn"),
+  bailian: makeBailianAdapters("https://dashscope.aliyuncs.com", "https://help.aliyun.com/zh/model-studio"),
+  "bailian-coding": makeBailianCodingAdapters(
+    "https://coding.dashscope.aliyuncs.com",
+    "https://help.aliyun.com/zh/model-studio",
+  ),
 };
+
 
 function vendorTargetAdapterFor(preset: VendorPreset, targetKey: TargetKey) {
   return vendorTargetAdapters[preset.id]?.[targetKey];
