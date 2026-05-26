@@ -335,6 +335,9 @@ function splitCodexOptionSectionLines(sectionLines: string[]) {
 function removeManagedCodexTomlLines(lines: string[], activeProviderId: string | null) {
   const next: string[] = [];
   let currentSection = "";
+  const hasActiveProviderSection = Boolean(activeProviderId)
+    && lines.some((line) => tomlSectionName(line) === `model_providers.${activeProviderId}`);
+  const shouldDropDefaultOpenAiProvider = activeProviderId === "openai" && !hasActiveProviderSection;
 
   for (const line of lines) {
     const sectionName = tomlSectionName(line);
@@ -346,6 +349,7 @@ function removeManagedCodexTomlLines(lines: string[], activeProviderId: string |
 
     const key = tomlAssignmentKey(line);
     if (key) {
+      if (!currentSection && key === "model_provider" && shouldDropDefaultOpenAiProvider) continue;
       if (!currentSection && managedCodexTopLevelTomlKeys.has(key)) continue;
       if (managedCodexSectionTomlKeys.get(currentSection)?.has(key)) continue;
       if (activeProviderId && currentSection === `model_providers.${activeProviderId}` && key === "supports_websockets") continue;

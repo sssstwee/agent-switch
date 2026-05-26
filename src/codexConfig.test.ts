@@ -354,6 +354,7 @@ includes(mergedOfficialToml.split("\n"), "memories = true");
 includes(mergedOfficialToml.split("\n"), "network_access = true");
 includes(mergedOfficialToml.split("\n"), "chronicle = true");
 equal(mergedOfficialToml.includes("disable_response_storage"), false);
+equal(mergedOfficialToml.includes('model_provider = "openai"'), false);
 equal(mergedOfficialToml.includes("goals = false"), false);
 equal(mergedOfficialToml.includes("network_access = false"), false);
 equal((mergedOfficialToml.match(/\[features\]/g) ?? []).length, 1);
