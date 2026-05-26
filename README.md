@@ -20,18 +20,29 @@ Switch++, Agent Router, model router, model switcher, LLM gateway, Claude Code t
 
 ### 功能亮点
 
-- 让第三方模型更容易进入 Claude、Codex 以及常用本地 AI 编程工具。
-- 支持 DeepSeek、MiniMax、Kimi、GLM 等国产模型接入 Codex 客户端及 Claude 客户端。
+- 让第三方模型稳定进入 Claude Code、Claude Desktop、Codex CLI、Codex Desktop 以及常用本地 AI 编程工具。
+- 支持 DeepSeek、MiniMax、Kimi、GLM 等国产模型接入 Codex 客户端及 Claude 客户端，并提供本地协议适配路径。
 - 支持国产模型接入 Codex 后配合使用官方插件和移动端能力；需先登录官方账号并添加官方配置，再与三方模型配置搭配使用。
 - 在官方账号模式和第三方模型厂商模式之间快速切换。
 - 为不同工具保存多套配置，并支持新增、编辑、复制、删除、排序和一键应用。
 - 写入前预览配置内容，并在应用前自动保留备份，便于回退。
 - 内置主流厂商预设、模型发现、能力提示和配置建议，减少手动试错。
-- 提供本地兼容网关，统一承接 Claude 与 Codex 的第三方模型调用。
-- 展示网关状态、调用记录、消耗统计、错误记录和趋势图表，方便定位问题。
+- 提供本地兼容网关，统一承接 Claude 与 Codex 的第三方模型调用，并处理 Anthropic / OpenAI / Responses / Chat Completions 之间的协议差异。
+- 展示网关状态、调用记录、消耗统计、缓存读写、错误记录和趋势图表，方便定位问题。
 - 检查本机工具、应用、配置文件、安装版本和可升级状态。
 - 支持一键安装、升级、卸载常用 CLI 工具。
 - 支持中英双语界面、紧凑侧边栏、系统托盘和桌面原生窗口体验。
+
+### 为什么选择 Switch++
+
+Switch++ 不只是一个 provider 切换器，而是面向 Claude / Codex 桌面与本地 agent 生态的三方模型接入控制台：
+
+- **Claude Desktop 深度适配**：管理桌面端第三方配置库，让 Claude Desktop 可以通过本地网关、官方模型名映射和厂商真实模型转发使用第三方模型。
+- **Codex Desktop 官方登录态隔离**：三方模型写入专用 `agent-switch` provider，尽量保留官方 `auth.json`、ChatGPT 登录壳、插件入口和移动端连接能力。
+- **本地兼容网关**：当目标应用与上游厂商协议不一致时，由 Switch++ 负责协议适配、模型映射、认证隔离、请求记录和统一启停。
+- **可诊断的请求链路**：请求详情、token、缓存命中、缓存创建、错误记录和趋势图都在本机可见，方便判断是账号、模型、协议还是网关问题。
+- **写入前可审计**：生成的 JSON / TOML 配置会先预览，推荐选项以勾选框呈现，并在应用前创建备份，降低误写配置的风险。
+- **本地 agent 工具链管理**：覆盖 Claude Code、Claude Desktop、Codex、Hermes、OpenCode、OpenClaw、Pi、Oh My OpenAgent、Oh My Pi 等常见本地 agent 入口。
 
 ### 界面预览 / Screenshots
 
@@ -200,18 +211,29 @@ Switch++, Agent Router, model router, model switcher, LLM gateway, Claude Code t
 
 ### Highlights
 
-- Bring third-party models into Claude, Codex, and common local AI coding tools.
-- Connect domestic model providers such as DeepSeek, MiniMax, Kimi, and GLM to Codex and Claude clients.
+- Bring third-party models into Claude Code, Claude Desktop, Codex CLI, Codex Desktop, and common local AI coding tools.
+- Connect domestic model providers such as DeepSeek, MiniMax, Kimi, and GLM to Codex and Claude clients through local protocol adaptation when needed.
 - Use official Codex plugins and mobile features alongside domestic model profiles after signing in with an official account and adding the official configuration.
 - Switch quickly between official-account mode and third-party provider mode.
 - Save multiple profiles per tool, then add, edit, duplicate, delete, reorder, and apply them quickly.
 - Preview local configuration before writing it, with backups created before changes are applied.
 - Use built-in provider presets, model discovery, capability notes, and recommendations to reduce trial and error.
-- Route Claude and Codex third-party model calls through the local compatibility gateway.
-- Inspect gateway status, request history, usage statistics, recent errors, and trend charts.
+- Route Claude and Codex third-party model calls through the local compatibility gateway, including Anthropic / OpenAI / Responses / Chat Completions protocol differences.
+- Inspect gateway status, request history, usage statistics, cache reads, cache creation, recent errors, and trend charts.
 - Check local tools, apps, config files, installed versions, and available upgrades.
 - Install, upgrade, and uninstall common CLI tools from the app.
 - Use the bilingual desktop interface with compact navigation, tray support, and native window behavior.
+
+### Why Switch++
+
+Switch++ is not just a provider switcher. It is a third-party model access console for Claude / Codex desktop workflows and local agent toolchains:
+
+- **Claude Desktop first-class support**: manage the desktop third-party config library, route Claude Desktop through the local gateway, and map official Claude model names to real provider models.
+- **Codex Desktop with official-login isolation**: write third-party models to a dedicated `agent-switch` provider while preserving the official `auth.json`, ChatGPT login shell, plugin entry points, and mobile connection path as much as possible.
+- **Local compatibility gateway**: when a target app and upstream provider speak different protocols, Switch++ handles protocol adaptation, model mapping, auth isolation, request records, and unified start/stop.
+- **Diagnosable request path**: request details, tokens, cache hits, cache creation, errors, and trend charts stay visible locally, making it easier to identify account, model, protocol, or gateway issues.
+- **Auditable writes**: generated JSON / TOML is previewed before writing, recommended options are exposed as checkboxes, and backups are created before applying changes.
+- **Local agent toolchain management**: cover Claude Code, Claude Desktop, Codex, Hermes, OpenCode, OpenClaw, Pi, Oh My OpenAgent, Oh My Pi, and other local agent entry points.
 
 ### Use Cases
 

@@ -6,7 +6,7 @@
     <title>Switch++ 下载与使用指南</title>
     <meta
       name="description"
-      content="Switch++ is a Claude Code, Claude Desktop, Codex CLI, Codex Desktop, Hermes, OpenCode, OpenClaw, Pi, and AI coding agent third-party config switcher, model router, and local OpenAI/Anthropic compatibility gateway."
+      content="Switch++ is a Claude Code, Claude Desktop, Codex CLI, Codex Desktop, and local AI agent third-party model access console with a local OpenAI/Anthropic compatibility gateway, request diagnostics, and auditable config writes."
     />
     <meta
       name="keywords"
@@ -192,6 +192,32 @@
         gap: 16px;
       }
 
+      .value-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 14px;
+      }
+
+      .value-card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        padding: 14px;
+      }
+
+      .value-card strong {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 15px;
+      }
+
+      .value-card p {
+        margin: 0;
+        color: var(--ink-muted);
+        font-size: 14px;
+      }
+
       .screenshot-card {
         margin: 0;
         overflow: hidden;
@@ -252,6 +278,10 @@
         .screenshot-grid {
           grid-template-columns: 1fr;
         }
+
+        .value-grid {
+          grid-template-columns: 1fr;
+        }
       }
     </style>
   </head>
@@ -266,14 +296,14 @@
           <div class="eyebrow">Switch++ 下载与使用指南</div>
           <h1>Switch++</h1>
           <p class="lead">
-            面向 Claude Code、Claude Desktop、Codex CLI、Codex Desktop、Hermes、OpenCode、OpenClaw、Pi 生态和其他 AI 编程 Agent 的三方接入配置切换工具、模型路由器和本地兼容网关。
+            面向 Claude Code、Claude Desktop、Codex CLI、Codex Desktop 和本地 AI 编程 Agent 的三方模型接入控制台，内置本地兼容网关、请求诊断和可审计配置写入。
           </p>
         </div>
         <div class="lang-block" data-lang="en">
           <div class="eyebrow">Switch++ Download and User Guide</div>
           <h1>Switch++</h1>
           <p class="lead">
-            Third-party config switcher, model router, and local compatibility gateway for Claude Code, Claude Desktop, Codex CLI, Codex Desktop, Hermes, OpenCode, OpenClaw, Pi-family, and other AI coding agents.
+            A third-party model access console for Claude Code, Claude Desktop, Codex CLI, Codex Desktop, and local AI coding agents, with a local compatibility gateway, request diagnostics, and auditable config writes.
           </p>
         </div>
         <div class="actions">
@@ -290,33 +320,98 @@
 
       <section>
         <h2>
+          <span class="lang-inline" data-lang="zh">为什么选择 Switch++</span>
+          <span class="lang-inline" data-lang="en">Why Switch++</span>
+        </h2>
+        <div class="lang-block" data-lang="zh">
+          <p>Switch++ 不只是一个 provider 切换器，而是面向 Claude / Codex 桌面与本地 agent 生态的三方模型接入控制台。</p>
+          <div class="value-grid">
+            <div class="value-card">
+              <strong>Claude Desktop 深度适配</strong>
+              <p>管理桌面端第三方配置库，通过本地网关和模型映射把官方模型名转发到厂商真实模型。</p>
+            </div>
+            <div class="value-card">
+              <strong>Codex Desktop 官方登录态隔离</strong>
+              <p>三方模型写入专用 provider，尽量保留官方 auth.json、ChatGPT 登录壳、插件入口和移动端连接能力。</p>
+            </div>
+            <div class="value-card">
+              <strong>本地兼容网关</strong>
+              <p>处理 Anthropic、OpenAI、Responses、Chat Completions 等协议差异，并统一请求记录与启停。</p>
+            </div>
+            <div class="value-card">
+              <strong>可诊断请求链路</strong>
+              <p>请求详情、token、缓存命中、缓存创建、错误记录和趋势图都在本机可见。</p>
+            </div>
+            <div class="value-card">
+              <strong>写入前可审计</strong>
+              <p>JSON / TOML 先预览，推荐选项用勾选框呈现，应用前创建备份。</p>
+            </div>
+            <div class="value-card">
+              <strong>本地 agent 工具链管理</strong>
+              <p>覆盖 Claude Code、Claude Desktop、Codex、Hermes、OpenCode、OpenClaw、Pi、Oh My 系列入口。</p>
+            </div>
+          </div>
+        </div>
+        <div class="lang-block" data-lang="en">
+          <p>Switch++ is not just a provider switcher. It is a third-party model access console for Claude / Codex desktop workflows and local agent toolchains.</p>
+          <div class="value-grid">
+            <div class="value-card">
+              <strong>Claude Desktop first-class support</strong>
+              <p>Manage the desktop config library and route official Claude model names to real provider models through the local gateway.</p>
+            </div>
+            <div class="value-card">
+              <strong>Codex Desktop with login isolation</strong>
+              <p>Write third-party models to a dedicated provider while preserving auth.json, the ChatGPT login shell, plugins, and mobile connection paths as much as possible.</p>
+            </div>
+            <div class="value-card">
+              <strong>Local compatibility gateway</strong>
+              <p>Handle Anthropic, OpenAI, Responses, and Chat Completions protocol differences with unified request records and start/stop controls.</p>
+            </div>
+            <div class="value-card">
+              <strong>Diagnosable request path</strong>
+              <p>Request details, tokens, cache hits, cache creation, errors, and trend charts stay visible locally.</p>
+            </div>
+            <div class="value-card">
+              <strong>Auditable writes</strong>
+              <p>Preview JSON / TOML before writing, expose recommended options as checkboxes, and create backups before applying changes.</p>
+            </div>
+            <div class="value-card">
+              <strong>Local agent toolchain management</strong>
+              <p>Cover Claude Code, Claude Desktop, Codex, Hermes, OpenCode, OpenClaw, Pi, and Oh My family entry points.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>
           <span class="lang-inline" data-lang="zh">功能亮点</span>
           <span class="lang-inline" data-lang="en">Highlights</span>
         </h2>
         <ul class="lang-block" data-lang="zh">
-          <li>让第三方模型更容易进入 Claude、Codex 以及常用本地 AI 编程工具。</li>
-          <li>支持 DeepSeek、MiniMax、Kimi、GLM 等国产模型接入 Codex 客户端及 Claude 客户端。</li>
+          <li>让第三方模型稳定进入 Claude Code、Claude Desktop、Codex CLI、Codex Desktop 以及常用本地 AI 编程工具。</li>
+          <li>支持 DeepSeek、MiniMax、Kimi、GLM 等国产模型接入 Codex 客户端及 Claude 客户端，并提供本地协议适配路径。</li>
           <li>支持国产模型接入 Codex 后配合使用官方插件和移动端能力；需先登录官方账号并添加官方配置，再与三方模型配置搭配使用。</li>
           <li>在官方账号模式和第三方模型厂商模式之间快速切换。</li>
           <li>为不同工具保存多套配置，并支持新增、编辑、复制、删除、排序和一键应用。</li>
           <li>写入前预览配置内容，并在应用前自动保留备份，便于回退。</li>
           <li>内置主流厂商预设、模型发现、能力提示和配置建议，减少手动试错。</li>
-          <li>提供本地兼容网关，统一承接 Claude 与 Codex 的第三方模型调用。</li>
-          <li>展示网关状态、调用记录、消耗统计、错误记录和趋势图表，方便定位问题。</li>
+          <li>提供本地兼容网关，统一承接 Claude 与 Codex 的第三方模型调用，并处理 Anthropic / OpenAI / Responses / Chat Completions 之间的协议差异。</li>
+          <li>展示网关状态、调用记录、消耗统计、缓存读写、错误记录和趋势图表，方便定位问题。</li>
           <li>检查本机工具、应用、配置文件、安装版本和可升级状态。</li>
           <li>支持一键安装、升级、卸载常用 CLI 工具。</li>
           <li>支持中英双语界面、紧凑侧边栏、系统托盘和桌面原生窗口体验。</li>
         </ul>
         <ul class="lang-block" data-lang="en">
-          <li>Bring third-party models into Claude, Codex, and common local AI coding tools.</li>
-          <li>Connect domestic model providers such as DeepSeek, MiniMax, Kimi, and GLM to Codex and Claude clients.</li>
+          <li>Bring third-party models into Claude Code, Claude Desktop, Codex CLI, Codex Desktop, and common local AI coding tools.</li>
+          <li>Connect domestic model providers such as DeepSeek, MiniMax, Kimi, and GLM to Codex and Claude clients through local protocol adaptation when needed.</li>
           <li>Use official Codex plugins and mobile features alongside domestic model profiles after signing in with an official account and adding the official configuration.</li>
           <li>Switch quickly between official-account mode and third-party provider mode.</li>
           <li>Save multiple profiles per tool, then add, edit, duplicate, delete, reorder, and apply them quickly.</li>
           <li>Preview local configuration before writing it, with backups created before changes are applied.</li>
           <li>Use built-in provider presets, model discovery, capability notes, and recommendations to reduce trial and error.</li>
-          <li>Route Claude and Codex third-party model calls through the local compatibility gateway.</li>
-          <li>Inspect gateway status, request history, usage statistics, recent errors, and trend charts.</li>
+          <li>Route Claude and Codex third-party model calls through the local compatibility gateway, including Anthropic / OpenAI / Responses / Chat Completions protocol differences.</li>
+          <li>Inspect gateway status, request history, usage statistics, cache reads, cache creation, recent errors, and trend charts.</li>
           <li>Check local tools, apps, config files, installed versions, and available upgrades.</li>
           <li>Install, upgrade, and uninstall common CLI tools from the app.</li>
           <li>Use the bilingual desktop interface with compact navigation, tray support, and native window behavior.</li>
@@ -416,18 +511,20 @@
           <span class="lang-inline" data-lang="en">Use Cases</span>
         </h2>
         <ul class="lang-block" data-lang="zh">
-          <li>在一个桌面应用里管理 Claude Code、Claude Desktop、Codex、Codex Desktop、OpenCode、Pi 生态配置。</li>
+          <li>在一个桌面应用里管理 Claude Code、Claude Desktop、Codex、Codex Desktop、Hermes、OpenCode、OpenClaw 和 Pi 生态配置。</li>
           <li>在官方账号模式和第三方模型厂商模式之间切换。</li>
-          <li>覆盖 Claude Code 第三方网关、Codex Desktop、本地 Codex third-party provider、OpenAI-compatible 和 Anthropic-compatible 端点。</li>
-          <li>通过本地兼容网关查看实时调用记录、token 统计和缓存命中统计。</li>
-          <li>写回本地配置前检查配置内容，并优先创建备份。</li>
+          <li>覆盖 Claude Code 第三方网关、Claude Desktop 本地网关、Codex Desktop、本地 Codex third-party provider、OpenAI-compatible 和 Anthropic-compatible 端点。</li>
+          <li>Codex 三方模型可通过本地 Responses runtime gateway 实时路由，同时保留 ChatGPT 官方登录态，继续服务 Codex Desktop、移动端连接和插件入口。</li>
+          <li>通过本地兼容网关查看实时调用记录、token 统计、缓存命中和缓存创建统计。</li>
+          <li>写回本地配置前检查配置内容、推荐选项和目标文件位置，并优先创建备份。</li>
         </ul>
         <ul class="lang-block" data-lang="en">
-          <li>Manage Claude Code, Claude Desktop, Codex, Codex Desktop, OpenCode, and Pi-family configuration in one desktop app.</li>
+          <li>Manage Claude Code, Claude Desktop, Codex, Codex Desktop, Hermes, OpenCode, OpenClaw, and Pi-family configuration in one desktop app.</li>
           <li>Switch between official-account mode and third-party model provider mode.</li>
-          <li>Cover Claude Code third-party gateways, Codex Desktop, local Codex third-party providers, OpenAI-compatible endpoints, and Anthropic-compatible endpoints.</li>
-          <li>Inspect local compatibility gateway calls, token totals, and cache-hit statistics.</li>
-          <li>Review generated local configuration before writing it, with backups created first.</li>
+          <li>Cover Claude Code third-party gateways, Claude Desktop local gateway profiles, Codex Desktop, local Codex third-party providers, OpenAI-compatible endpoints, and Anthropic-compatible endpoints.</li>
+          <li>Route Codex third-party models through the local Responses runtime gateway while preserving the official ChatGPT login shell used by Codex Desktop, mobile access, and plugin entry points.</li>
+          <li>Inspect local compatibility gateway calls, token totals, cache hits, and cache creation statistics.</li>
+          <li>Review generated local configuration, recommended options, and target file locations before writing, with backups created first.</li>
         </ul>
       </section>
 
@@ -567,17 +664,17 @@ open "/Applications/Switch++.app"</code></pre>
           <p>If macOS says Switch++ is not from the App Store or cannot verify the developer, first confirm that macOS allows apps from outside the App Store:</p>
           <ol>
             <li>Open System Settings.</li>
-            <li>Go to Privacy & Security.</li>
+            <li>Go to Privacy &amp; Security.</li>
             <li>Find Security.</li>
             <li>Under Allow applications downloaded from, select Anywhere.</li>
           </ol>
           <p>If Anywhere is not visible, run this command in Terminal to enable it:</p>
           <pre><code>sudo spctl --master-disable</code></pre>
-          <p>Then return to System Settings > Privacy & Security > Security, and confirm that Anywhere is available and selected.</p>
+          <p>Then return to System Settings > Privacy &amp; Security > Security, and confirm that Anywhere is available and selected.</p>
           <p>After first install, macOS may still block launch because the downloaded app has a quarantine flag. If you have confirmed the installer came from this repository's release page, run:</p>
           <pre><code>sudo xattr -rd com.apple.quarantine "/Applications/Switch++.app"
 open "/Applications/Switch++.app"</code></pre>
-          <p>If macOS still blocks the app, return to Privacy & Security, click Open Anyway next to the Switch++ warning, and launch the app again.</p>
+          <p>If macOS still blocks the app, return to Privacy &amp; Security, click Open Anyway next to the Switch++ warning, and launch the app again.</p>
           <p>After Switch++ opens normally, you can restore the default macOS security setting with:</p>
           <pre><code>sudo spctl --master-enable</code></pre>
         </div>
