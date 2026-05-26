@@ -112,7 +112,13 @@ export function GatewayOverviewChart({
 }: GatewayOverviewChartProps) {
   const stats = overview.stats;
   const errorRate = stats.request_count > 0 ? (stats.error_count / stats.request_count) * 100 : 0;
-  const cacheRate = stats.input_tokens > 0 ? (stats.cache_tokens / stats.input_tokens) * 100 : 0;
+  const cacheRateInputTokens = overview.target === "claude_desktop"
+    ? stats.latest_input_tokens
+    : stats.input_tokens;
+  const cacheRateTokens = overview.target === "claude_desktop"
+    ? stats.latest_cache_tokens
+    : stats.cache_tokens;
+  const cacheRate = cacheRateInputTokens > 0 ? (cacheRateTokens / cacheRateInputTokens) * 100 : 0;
 
   const inputKey = t("输入", language);
   const outputKey = t("输出", language);

@@ -198,6 +198,8 @@ export type CodexProxyOverviewStats = {
   output_tokens: number;
   total_tokens: number;
   cache_tokens: number;
+  latest_input_tokens: number;
+  latest_cache_tokens: number;
   avg_latency_ms: number;
   p50_latency_ms: number;
   p95_latency_ms: number;

@@ -371,6 +371,7 @@ const mergedProviderWebsocketToml = mergeCodexConfigOptionsIntoToml(
   ].join("\n"),
   { ...defaultCodexConfigOptions, disable_websockets: true },
 );
+includes(mergedProviderWebsocketToml.split("\n"), 'model_provider = "agent-switch"');
 includes(mergedProviderWebsocketToml.split("\n"), "[model_providers.agent-switch]");
 includes(mergedProviderWebsocketToml.split("\n"), "supports_websockets = false");
 excludes(mergedProviderWebsocketToml.split("\n").slice(0, 4), "supports_websockets = false");

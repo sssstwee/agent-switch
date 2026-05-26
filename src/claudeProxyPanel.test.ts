@@ -287,6 +287,8 @@ equal(uiTranslation.includes("\"输入 Token\": \"Input Tokens\""), true);
 equal(uiTranslation.includes("\"输出 Token\": \"Output Tokens\""), true);
 equal(gatewayPage.includes("缓存命中"), true);
 equal(gatewayOverviewChart.includes("stats.cache_tokens"), true);
+equal(gatewayOverviewChart.includes("stats.latest_cache_tokens"), true);
+equal(gatewayOverviewChart.includes('overview.target === "claude_desktop"'), true);
 equal(gatewayOverviewChart.includes("缓存命中"), true);
 equal(gatewayProxyPanel.includes("function formatProxyTokenMillions"), true);
 equal(gatewayProxyPanel.includes("function formatProxyTokenK"), true);
