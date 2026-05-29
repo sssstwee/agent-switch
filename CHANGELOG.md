@@ -1,5 +1,58 @@
 # Changelog
 
+## v1.0.2 - 2026-05-30
+
+Switch++ 小版本更新。本次重点打磨桌面端外观、窗口比例、侧栏密度、滚动体验和细节动效，让应用更像一个紧凑、原生、可长期停留在桌面的工具。
+
+### 功能亮点 / Highlights
+
+- 重新校准默认窗口尺寸为 `936x655`，保持约 `1.43` 的宽高比，并限制最小尺寸，避免工具窗口被缩到不可用状态。
+- 将左侧侧栏固定为窗口宽度的 25%，在默认尺寸下完整展示应用与工具菜单，减少默认进入时的滚动需求。
+- 优化配置列表顶部栏在最小尺寸下的收缩规则，保留右侧操作按钮单行显示，标题和描述在空间不足时自然省略。
+- 隐藏内部滚动条但保留滚动能力，让侧栏、配置列表、网关详情和配置编辑区域视觉上更干净。
+- 统一窗口、面板、卡片、按钮、菜单和弹出层的圆角 token，保持更一致的 macOS 工具应用质感。
+- 为刷新、网关启停、更多菜单、更新提示和菜单项加入克制微动效，同时遵守系统的 reduced motion 偏好。
+- 改进菜单栏图标为独立的 switch 模板图标，避免 Dock 图标和菜单栏图标混用导致显示成黑块或比例失真。
+- 修正英文模式下的短状态与动作翻译，避免出现中英混排或半翻译状态。
+
+### 界面预览 / Screenshots
+
+**Codex Desktop 使用 DeepSeek 三方模型 / Codex Desktop with a DeepSeek third-party model**
+
+![Codex Desktop 使用 DeepSeek 三方模型](https://raw.githubusercontent.com/sssstwee/switch-plus-plus/v1.0.2/docs/assets/screenshots/switchpp-codex-desktop-deepseek.png)
+
+| Codex 配置列表 / Codex profiles | 新增 Codex 配置 / New Codex profile |
+| --- | --- |
+| ![Codex 配置列表](https://raw.githubusercontent.com/sssstwee/switch-plus-plus/v1.0.2/docs/assets/screenshots/switchpp-codex-profiles.png) | ![新增 Codex 配置](https://raw.githubusercontent.com/sssstwee/switch-plus-plus/v1.0.2/docs/assets/screenshots/switchpp-codex-new-profile.png) |
+
+| Claude Desktop 配置切换 / Claude Desktop profiles | 本地环境检查 / Environment check |
+| --- | --- |
+| ![Claude Desktop 配置切换](https://raw.githubusercontent.com/sssstwee/switch-plus-plus/v1.0.2/docs/assets/screenshots/switchpp-claude-desktop-profiles.png) | ![本地环境检查](https://raw.githubusercontent.com/sssstwee/switch-plus-plus/v1.0.2/docs/assets/screenshots/switchpp-environment-check.png) |
+
+| 兼容网关概览 / Gateway overview | 兼容网关调用记录 / Gateway request history |
+| --- | --- |
+| ![兼容网关概览](https://raw.githubusercontent.com/sssstwee/switch-plus-plus/v1.0.2/docs/assets/screenshots/switchpp-gateway-overview.png) | ![兼容网关调用记录](https://raw.githubusercontent.com/sssstwee/switch-plus-plus/v1.0.2/docs/assets/screenshots/switchpp-gateway-requests.png) |
+
+| Claude Desktop 模型菜单 / Claude Desktop model menu | Claude Desktop 经由本地网关响应 / Claude Desktop through local gateway |
+| --- | --- |
+| ![Claude Desktop 模型菜单](https://raw.githubusercontent.com/sssstwee/switch-plus-plus/v1.0.2/docs/assets/screenshots/switchpp-claude-model-menu.png) | ![Claude Desktop 经由本地网关响应](https://raw.githubusercontent.com/sssstwee/switch-plus-plus/v1.0.2/docs/assets/screenshots/switchpp-claude-gateway-chat.png) |
+
+### macOS 首次启动说明 / macOS First-Launch Notice
+
+Switch++ 尚未通过 Apple 公证（notarization），macOS 首次启动时可能会阻止。安装到 `/Applications` 后请运行：
+
+```bash
+sudo xattr -rd com.apple.quarantine "/Applications/Switch++.app"
+open "/Applications/Switch++.app"
+```
+
+Switch++ has not passed Apple notarization yet, so macOS may block it on first launch. After installing to `/Applications`, run:
+
+```bash
+sudo xattr -rd com.apple.quarantine "/Applications/Switch++.app"
+open "/Applications/Switch++.app"
+```
+
 ## v1.0.1 - 2026-05-26
 
 Switch++ 小版本更新。本次重点改进 Claude / Codex 本地兼容网关、后台流量统计、推荐配置项和公开说明，让第三方模型接入 Claude Desktop、Codex Desktop 和 Claude Code 时更容易诊断、更稳定。

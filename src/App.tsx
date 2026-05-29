@@ -198,12 +198,6 @@ import { useAppUiStore } from "./store/useAppUiStore.ts";
 import { useShellUiStore } from "./store/useShellUiStore.ts";
 
 const McpSkillsView = lazy(() => import("./McpSkillsView.tsx"));
-const PROFILE_DISPLAY_NAME_MAX_LENGTH = 15;
-
-function limitProfileDisplayName(value: string) {
-  return Array.from(value).slice(0, PROFILE_DISPLAY_NAME_MAX_LENGTH).join("");
-}
-
 function envCheckCardSortIndex(key: string) {
   const index = ENV_CHECK_CARD_ORDER.indexOf(key as EnvCheckCardKey);
   return index >= 0 ? index : ENV_CHECK_CARD_ORDER.length;

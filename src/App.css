@@ -94,9 +94,9 @@
     ui-rounded, "SF Pro Rounded", "SF Compact Rounded", "Arial Rounded MT Bold",
     "Avenir Next", Avenir, var(--font-sans);
   --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  --sidebar-width: 224px;
-  --sidebar-min-width: 224px;
-  --sidebar-max-width: 224px;
+  --sidebar-width: 234px;
+  --sidebar-min-width: 234px;
+  --sidebar-max-width: 234px;
   --sidebar-titlebar-height: 50px;
   --window-drag-height: 24px;
   --window-radius: 32px;
@@ -111,6 +111,8 @@
   --menu-item-bg-active: var(--surface-3);
   --menu-item-border: transparent;
   --menu-item-border-active: transparent;
+  --motion-fast: 0.12s ease;
+  --motion-micro: 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 :root[data-theme="dark"] {
@@ -491,6 +493,19 @@ button {
   transition: grid-template-columns 0.18s ease;
 }
 
+.ccr-app,
+.ccr-app * {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.ccr-app::-webkit-scrollbar,
+.ccr-app *::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
 /* ═══ Sidebar ═══ */
 
 .ccr-sidebar {
@@ -627,10 +642,23 @@ button {
   color: var(--brand-accent);
   box-shadow: 0 1px 3px rgba(20, 18, 12, 0.08);
   cursor: default;
+  animation: ccr-update-indicator-breathe 2.8s ease-in-out infinite;
+  transition: background var(--motion-fast), border-color var(--motion-fast), transform var(--motion-micro);
 }
 
 .ccr-sidebar-update-indicator:hover {
   background: color-mix(in oklab, var(--brand-accent-bg) 70%, var(--surface));
+  transform: translateY(-1px);
+}
+
+@keyframes ccr-update-indicator-breathe {
+  0%,
+  100% {
+    box-shadow: 0 1px 3px rgba(20, 18, 12, 0.08);
+  }
+  50% {
+    box-shadow: 0 1px 4px rgba(20, 18, 12, 0.08), 0 0 0 5px color-mix(in oklab, var(--brand-accent) 8%, transparent);
+  }
 }
 
 .ccr-sidebar-settings-toggle {
@@ -802,7 +830,7 @@ button {
   font-weight: 600;
   line-height: 1.2;
   color: var(--ink-2);
-  transition: background 0.12s ease, color 0.12s ease;
+  transition: background var(--motion-fast), border-color var(--motion-fast), color var(--motion-fast), transform var(--motion-micro);
   cursor: default;
 }
 
@@ -830,6 +858,10 @@ button {
   box-shadow: none;
 }
 
+.ccr-target-btn:not(:disabled):active {
+  transform: translateY(1px);
+}
+
 .ccr-target-btn-icon {
   width: 18px;
   height: 18px;
@@ -838,6 +870,7 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: color var(--motion-fast), transform var(--motion-micro);
 }
 
 .ccr-target-logo-frame {
@@ -856,6 +889,7 @@ button {
   height: 18px;
   display: block;
   object-fit: contain;
+  transition: transform var(--motion-micro);
 }
 
 .ccr-target-btn .ccr-target-logo,
@@ -868,6 +902,11 @@ button {
 .ccr-target-btn:hover .ccr-target-btn-icon img {
   filter: none;
   opacity: 1;
+}
+
+.ccr-target-btn:not(:disabled):hover .ccr-target-btn-icon,
+.ccr-target-btn:not(:disabled):hover .ccr-target-logo {
+  transform: translateX(1px);
 }
 
 .ccr-target-btn.active .ccr-target-logo,
@@ -891,6 +930,7 @@ button {
   width: 18px;
   height: 18px;
   color: currentColor;
+  transition: transform var(--motion-micro);
 }
 
 .ccr-env-nav-icon {
@@ -924,6 +964,7 @@ button {
 
 .ccr-header-addon {
   flex: none;
+  align-self: flex-start;
 }
 
 .ccr-header-addon .ccr-target-btn {
@@ -938,6 +979,7 @@ button {
   background: var(--ink);
   color: var(--button-primary-fg);
   border-radius: var(--control-radius);
+  white-space: nowrap;
 }
 
 .ccr-header-addon .ccr-target-btn:hover {
@@ -1059,6 +1101,22 @@ button {
     scroll-behavior: auto !important;
     transition-duration: 0.001ms !important;
   }
+
+  .ccr-target-btn:hover .ccr-target-btn-icon,
+  .ccr-target-btn:hover .ccr-target-logo,
+  .ccr-target-btn:active,
+  .ccr-sidebar-update-indicator:hover,
+  .ccr-config-compact-action:hover,
+  .ccr-config-compact-action:hover svg,
+  .ccr-config-compact-action:active,
+  .ccr-config-more-item:hover svg,
+  .ccr-config-more-item:focus-visible svg,
+  .ccr-config-more-item[data-highlighted] svg,
+  .ccr-proxy-action-btn:hover,
+  .ccr-proxy-action-btn:active,
+  .ccr-proxy-action-btn:hover .ccr-proxy-action-icon {
+    transform: none !important;
+  }
 }
 
 .ccr-main-header {
@@ -1066,18 +1124,22 @@ button {
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
+  min-width: 0;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--line);
 }
 
 .ccr-main-header-left {
+  flex: 1 1 auto;
   min-width: 0;
+  overflow: hidden;
 }
 
 .ccr-main-header-row {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
   margin-bottom: 4px;
 }
 
@@ -1102,6 +1164,10 @@ button {
 
 .ccr-main-header-row h1 {
   margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -1114,6 +1180,9 @@ button {
   font-size: 12.5px;
   line-height: 1.5;
   max-width: 520px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .ccr-gateway-requirement-badge {
@@ -2151,7 +2220,7 @@ button {
   letter-spacing: 0;
   box-shadow: var(--control-shadow);
   cursor: default;
-  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+  transition: background var(--motion-fast), border-color var(--motion-fast), color var(--motion-fast), box-shadow var(--motion-fast), transform var(--motion-micro);
 }
 
 .ccr-proxy-action-btn:hover {
@@ -2159,6 +2228,7 @@ button {
   background: var(--button-secondary-bg-hover);
   color: var(--ink);
   box-shadow: var(--control-shadow);
+  transform: translateY(-1px);
 }
 
 .ccr-proxy-action-btn:active {
@@ -2188,6 +2258,7 @@ button {
   height: 8px;
   flex: none;
   color: currentColor;
+  transition: transform var(--motion-micro);
 }
 
 .ccr-proxy-action-btn.start .ccr-proxy-action-icon {
@@ -2197,6 +2268,10 @@ button {
   border-bottom: 4px solid transparent;
   border-left: 7px solid currentColor;
   transform: translateX(1px);
+}
+
+.ccr-proxy-action-btn.start:hover .ccr-proxy-action-icon {
+  transform: translateX(1px) scale(1.08);
 }
 
 .ccr-proxy-action-btn.danger {
@@ -2216,12 +2291,20 @@ button {
   background: currentColor;
 }
 
+.ccr-proxy-action-btn.danger:hover .ccr-proxy-action-icon {
+  transform: scale(0.92);
+}
+
 .ccr-proxy-action-btn.busy .ccr-proxy-action-icon {
   border: 2px solid color-mix(in srgb, currentColor 28%, transparent);
   border-top-color: currentColor;
   border-radius: 999px;
   background: transparent;
   animation: ccr-proxy-spin 0.75s linear infinite;
+}
+
+.ccr-proxy-action-btn.busy:hover {
+  transform: none;
 }
 
 .ccr-proxy-action-btn:disabled,
@@ -2571,17 +2654,33 @@ button {
   font-size: 12px !important;
   font-weight: 600 !important;
   gap: 5px !important;
+  transition: background var(--motion-fast), border-color var(--motion-fast), color var(--motion-fast), box-shadow var(--motion-fast), transform var(--motion-micro) !important;
 }
 
 .ccr-config-compact-action svg {
   width: 12px !important;
   height: 12px !important;
+  transition: transform var(--motion-micro);
 }
 
 .ccr-config-compact-action:hover {
   border-color: color-mix(in oklab, var(--line-2) 92%, var(--surface)) !important;
   background: color-mix(in oklab, var(--surface-2) 72%, var(--surface)) !important;
   color: var(--ink) !important;
+  transform: translateY(-1px);
+}
+
+.ccr-config-compact-action:disabled:hover,
+.ccr-config-compact-action[aria-disabled="true"]:hover {
+  transform: none;
+}
+
+.ccr-config-compact-action:hover svg {
+  transform: scale(1.06);
+}
+
+.ccr-config-compact-action:active {
+  transform: translateY(0);
 }
 
 .ccr-delete-confirm-action {
@@ -2614,6 +2713,8 @@ button {
   background: var(--surface);
   box-shadow: var(--card-shadow);
   outline: none;
+  transform-origin: top right;
+  animation: ccr-menu-pop 0.12s ease-out;
 }
 
 .ccr-config-more-item {
@@ -2633,12 +2734,13 @@ button {
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
-  transition: background 0.12s ease, color 0.12s ease;
+  transition: background var(--motion-fast), color var(--motion-fast);
 }
 
 .ccr-config-more-item svg {
   width: 13px;
   height: 13px;
+  transition: transform var(--motion-micro);
 }
 
 .ccr-config-more-item:hover,
@@ -2647,6 +2749,12 @@ button {
   outline: none;
   background: color-mix(in oklab, var(--surface-3) 74%, var(--surface));
   color: var(--ink);
+}
+
+.ccr-config-more-item:hover svg,
+.ccr-config-more-item:focus-visible svg,
+.ccr-config-more-item[data-highlighted] svg {
+  transform: translateX(1px);
 }
 
 .ccr-config-more-item-danger {
@@ -2670,6 +2778,17 @@ button {
   border-color: color-mix(in oklab, var(--ok) 32%, var(--line)) !important;
   background: color-mix(in oklab, var(--ok) 12%, var(--surface)) !important;
   color: color-mix(in oklab, var(--ok) 72%, var(--ink)) !important;
+}
+
+@keyframes ccr-menu-pop {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* ═══ Edit panel (expanded inline) ═══ */
@@ -5184,14 +5303,6 @@ button {
 
   .ccr-codex-proxy-panel {
     left: 22px;
-  }
-
-  .ccr-main-header {
-    flex-direction: column;
-  }
-
-  .ccr-main-header-right {
-    width: 100%;
   }
 
   .ccr-model-row {

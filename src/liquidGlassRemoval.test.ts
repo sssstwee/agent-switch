@@ -12,7 +12,6 @@ function equal<T>(actual: T, expected: T) {
 }
 
 const appCss = readFileSync(new URL("./App.css", import.meta.url), "utf8");
-const tauriConfig = readFileSync(new URL("../src-tauri/tauri.conf.json", import.meta.url), "utf8");
 const cargoToml = readFileSync(new URL("../src-tauri/Cargo.toml", import.meta.url), "utf8");
 
 equal(includesForbidden(appCss, ["liquid glass", "glass-effect", "backdrop-filter"]).length, 0);

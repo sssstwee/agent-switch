@@ -33,9 +33,9 @@ test("uiTranslation module exports expected functions", async () => {
 
 test("appConstants exports expected constants", async () => {
   const mod = await import("./appConstants.ts");
-  assert.equal(mod.SIDEBAR_DEFAULT_WIDTH, 224);
-  assert.equal(mod.SIDEBAR_MIN_WIDTH, 224);
-  assert.equal(mod.SIDEBAR_MAX_WIDTH, 224);
+  assert.equal(mod.SIDEBAR_DEFAULT_WIDTH, 234);
+  assert.equal(mod.SIDEBAR_MIN_WIDTH, 234);
+  assert.equal(mod.SIDEBAR_MAX_WIDTH, 234);
   assert.equal(mod.DEFAULT_ENV_CARD_KEY, "codex_cli");
 });
 

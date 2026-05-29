@@ -3,7 +3,7 @@
   "private": true,
   "description": "Switch++ brings third-party models into Claude Code, Claude Desktop, Codex CLI, and Codex Desktop with config switching, local gateway routing, and call observability.",
   "license": "SEE LICENSE IN LICENSE",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "homepage": "https://sssstwee.github.io/switch-plus-plus/",
   "repository": {
