@@ -22,8 +22,8 @@ export function selectedPresetById(presetId: string | null) {
 
 export function codexCompatModeForPreset(preset: VendorPreset | null): CodexCompatMode {
   if (!preset) return "proxy";
-  if (preset.codex_compat_mode) return preset.codex_compat_mode;
-  return preset.codex_support_status === "responses" ? "direct" : "proxy";
+  if (preset.id === "openai" || preset.id === "openai-package") return "direct";
+  return "proxy";
 }
 
 export function claudeCompatModeForPreset(preset: VendorPreset | null): CodexCompatMode {

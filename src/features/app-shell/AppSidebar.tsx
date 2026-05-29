@@ -2,14 +2,11 @@ import {
   ArrowCircleUp as UpdateAvailableIcon,
   GearSix as SettingsIcon,
   ShieldCheck as ShieldCheckIcon,
-  SidebarSimple as SidebarToggleIcon,
   Stack as LayersIcon,
 } from "@phosphor-icons/react";
-import type { CSSProperties, RefObject, MouseEvent, PointerEvent as ReactPointerEvent } from "react";
+import type { CSSProperties, RefObject, MouseEvent } from "react";
 import {
   APP_REPOSITORY_URL,
-  SIDEBAR_MAX_WIDTH,
-  SIDEBAR_MIN_WIDTH,
   type AppLanguage,
 } from "../../appConstants.ts";
 import type { AppUpdateCheckResult, TargetKey } from "../../appTypes.ts";
@@ -24,16 +21,12 @@ type AppSidebarProps = {
   onLanguageChange: (language: AppLanguage) => void;
   onSettingsBackdropClick: () => void;
   onSettingsToggle: () => void;
-  onSidebarResizePointerDown: (event: ReactPointerEvent<HTMLDivElement>) => void;
-  onSidebarToggle: () => void;
   onTargetSelect: (target: TargetKey) => void;
   onUpdateClick: (event?: MouseEvent<HTMLElement>) => void;
   onWindowDrag: (event: MouseEvent<HTMLElement>) => void;
   settingsButtonRef: RefObject<HTMLButtonElement | null>;
   settingsPopoverOpen: boolean;
   settingsPopoverStyle: CSSProperties;
-  sidebarCollapsed: boolean;
-  sidebarWidth: number;
   target: TargetKey;
   view: string;
 };
@@ -46,16 +39,12 @@ export function AppSidebar({
   onLanguageChange,
   onSettingsBackdropClick,
   onSettingsToggle,
-  onSidebarResizePointerDown,
-  onSidebarToggle,
   onTargetSelect,
   onUpdateClick,
   onWindowDrag,
   settingsButtonRef,
   settingsPopoverOpen,
   settingsPopoverStyle,
-  sidebarCollapsed,
-  sidebarWidth,
   target,
   view,
 }: AppSidebarProps) {
@@ -68,28 +57,10 @@ export function AppSidebar({
   return (
     <>
       <aside className="ccr-sidebar">
-        <div
-          aria-label="调整菜单宽度"
-          aria-orientation="vertical"
-          aria-valuemax={SIDEBAR_MAX_WIDTH}
-          aria-valuemin={SIDEBAR_MIN_WIDTH}
-          aria-valuenow={sidebarWidth}
-          className="ccr-sidebar-resize-handle"
-          onPointerDown={onSidebarResizePointerDown}
-          role="separator"
-          title="调整菜单宽度"
-        />
-        <div className="ccr-sidebar-window-strip" data-tauri-drag-region onMouseDown={onWindowDrag}>
-          <button
-            type="button"
-            className="ccr-sidebar-collapse-toggle"
-            aria-label={sidebarCollapsed ? "展开菜单" : "折叠菜单"}
-            title={sidebarCollapsed ? "展开菜单" : "折叠菜单"}
-            aria-pressed={sidebarCollapsed}
-            onClick={onSidebarToggle}
-          >
-            <SidebarToggleIcon className="h-4 w-4" />
-          </button>
+        <div className="ccr-sidebar-window-strip" data-tauri-drag-region onMouseDown={onWindowDrag} />
+
+        <div className="ccr-sidebar-brand">
+          <strong>Switch++</strong>
         </div>
 
         {appUpdate?.has_update && appUpdate.release_url ? (
@@ -105,6 +76,9 @@ export function AppSidebar({
         ) : null}
 
         <div className="ccr-sidebar-menu">
+          <div className="ccr-sidebar-section-head">
+            <span className="ccr-sidebar-section-label">应用</span>
+          </div>
           <nav className="ccr-target-nav">
             {visibleTargetOptions.map((option) => {
               const isActive = option.key === target && view !== "env" && view !== "gateway";
@@ -133,19 +107,22 @@ export function AppSidebar({
         </div>
 
         <div className="ccr-sidebar-bottom">
-          <button
-            className={"ccr-target-btn" + (view === "gateway" ? " active" : "")}
-            onClick={onGatewayView}
-            aria-label="兼容网关"
-            title="兼容网关"
-            type="button"
-          >
-            <span className="ccr-target-btn-icon ccr-target-logo-frame ccr-env-nav-icon">
-              <LayersIcon className="h-4 w-4" />
-            </span>
-            <span className="ccr-target-btn-label">兼容网关</span>
-          </button>
-          <div className="ccr-sidebar-bottom-row">
+          <div className="ccr-sidebar-section-head">
+            <span className="ccr-sidebar-section-label">工具</span>
+          </div>
+          <nav className="ccr-sidebar-tool-nav" aria-label="工具">
+            <button
+              className={"ccr-target-btn" + (view === "gateway" ? " active" : "")}
+              onClick={onGatewayView}
+              aria-label="兼容网关"
+              title="兼容网关"
+              type="button"
+            >
+              <span className="ccr-target-btn-icon ccr-target-logo-frame ccr-env-nav-icon">
+                <LayersIcon className="h-4 w-4" />
+              </span>
+              <span className="ccr-target-btn-label">兼容网关</span>
+            </button>
             <button
               className={"ccr-target-btn" + (view === "env" ? " active" : "")}
               onClick={onEnvView}
@@ -161,16 +138,19 @@ export function AppSidebar({
             <button
               ref={settingsButtonRef}
               type="button"
-              className="ccr-sidebar-settings-toggle"
+              className="ccr-target-btn ccr-sidebar-settings-toggle"
               aria-label="设置"
               aria-expanded={settingsPopoverOpen}
               aria-haspopup="dialog"
               title="设置"
               onClick={onSettingsToggle}
             >
-              <SettingsIcon className="h-4 w-4" />
+              <span className="ccr-target-btn-icon ccr-target-logo-frame ccr-env-nav-icon">
+                <SettingsIcon className="h-4 w-4" />
+              </span>
+              <span className="ccr-target-btn-label">设置</span>
             </button>
-          </div>
+          </nav>
         </div>
       </aside>
 

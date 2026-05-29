@@ -60,6 +60,26 @@ const directThirdPartyClaudeProfile: GatewayProfile = {
   compat_mode: "direct",
 };
 
+const genericDirectThirdPartyClaudeProfile: GatewayProfile = {
+  ...baseGatewayProfile,
+  id: "profile-generic-anthropic",
+  display_name: "Example Anthropic 兼容",
+  base_url: "https://llm-gateway.example.com/anthropic",
+  compat_mode: "direct",
+  model_map: {
+    main: "example-pro",
+    haiku: "example-fast",
+    sonnet: "example-pro",
+    opus: "example-pro",
+  },
+  provider_model_map: {
+    main: "example-pro",
+    haiku: "example-fast",
+    sonnet: "example-pro",
+    opus: "example-pro",
+  },
+};
+
 const chatOnlyClaudeProfile: GatewayProfile = {
   ...baseGatewayProfile,
   id: "profile-4",
@@ -218,17 +238,23 @@ notMatch(gatewayRequirementForProfile("claude_cli", chatOnlyClaudeProfile).detai
 notMatch(gatewayRequirementForProfile("claude_cli", googleClaudeProfile).limitation ?? "", /OpenAI/);
 notMatch(gatewayRequirementForProfile("claude_cli", modelscopeClaudeProfile).limitation ?? "", /OpenAI/);
 notMatch(gatewayRequirementForProfile("codex", codexProxyProfile).limitation ?? "", /Anthropic/);
-equal(gatewayRequirementForProfile("claude_cli", baseGatewayProfile).label, "建议开启");
+equal(gatewayRequirementForProfile("claude_cli", baseGatewayProfile).label, "必须开启");
 equal(gatewayRequirementForProfile("claude_cli", directClaudeProfile).label, "无需开启");
-equal(gatewayRequirementForProfile("claude_cli", directThirdPartyClaudeProfile).label, "建议开启");
-equal(gatewayRequirementForProfile("claude_cli", directThirdPartyClaudeProfile).cornerLabel, "建议");
+equal(gatewayRequirementForProfile("claude_cli", directThirdPartyClaudeProfile).label, "必须开启");
+equal(gatewayRequirementForProfile("claude_cli", directThirdPartyClaudeProfile).cornerLabel, "必开");
 equal(
   gatewayRequirementForProfile("claude_cli", directThirdPartyClaudeProfile).detail,
+  "当前问题：最新版 Claude Code 直连该厂商 Anthropic 兼容端点实测失败，需要通过 Switch++ 本地网关完成模型映射、请求清洗、工具 schema 压缩和兼容转发。",
+);
+equal(gatewayRequirementForProfile("claude_cli", genericDirectThirdPartyClaudeProfile).label, "建议开启");
+equal(gatewayRequirementForProfile("claude_cli", genericDirectThirdPartyClaudeProfile).cornerLabel, "建议");
+equal(
+  gatewayRequirementForProfile("claude_cli", genericDirectThirdPartyClaudeProfile).detail,
   "当前问题：上游已支持 Anthropic Messages，Claude Code 可以直接连接厂商，但不经过本地网关会缺少模型别名、调用记录、请求预检和工具 schema 压缩。开启收益：本地网关保留原生协议能力，同时降低模型跑偏与 Prompt 过长风险。",
 );
 equal(
   gatewayRequirementForProfile("claude_cli", baseGatewayProfile).detail,
-  "当前问题：DeepSeek Anthropic API 可以由 Claude Code 直接连接，但不经过本地网关时 Claude 模型名可能被上游自动映射到 flash，且图片/文档内容块不受支持。开启收益：Switch++ 接管模型别名映射、请求预检、调用记录和工具 schema 压缩，降低模型跑偏与 Prompt 过长风险。",
+  "当前问题：最新版 Claude Code 直连该厂商 Anthropic 兼容端点实测失败，需要通过 Switch++ 本地网关完成模型映射、请求清洗、工具 schema 压缩和兼容转发。",
 );
 equal(
   gatewayRequirementForProfile("claude_cli", baseGatewayProfile).limitation,
@@ -238,6 +264,8 @@ equal(
   gatewayRequirementForProfile("claude_cli", minimaxClaudeProfile).limitation,
   "仍有限制：MiniMax 官方 Claude Code 文档使用 M2.7，并提示图片理解需要额外配置 Image Understanding MCP；本地网关只处理连接、模型映射和请求预检，不会把 M2.7 文本/代码模型变成视觉模型。",
 );
+equal(gatewayRequirementForProfile("claude_cli", minimaxClaudeProfile).label, "必须开启");
+equal(gatewayRequirementForProfile("claude_cli", minimaxClaudeProfile).cornerLabel, "必开");
 equal(
   gatewayRequirementForProfile("claude_cli", kimiCodeClaudeProfile).limitation,
   "仍有限制：Kimi Code 文档要求第三方 Coding Agent 使用 kimi-for-coding；图片/视频能力未作为该 Claude Code 接入路径的稳定能力声明，本地网关不会补齐上游未开放的多模态能力。",
@@ -254,19 +282,30 @@ equal(
 equal(gatewayRequirementForProfile("claude_desktop", directThirdPartyClaudeProfile).label, "必须开启");
 equal(
   gatewayRequirementForProfile("claude_desktop", directThirdPartyClaudeProfile).detail,
-  "当前问题：Claude Desktop 使用 Claude 官方模型名，第三方 Anthropic 上游不经过本地网关时模型映射不可控，可能落到默认模型或失败。开启收益：Switch++ 接管模型别名映射、请求预检、调用记录和工具 schema 压缩。",
+  "当前问题：该厂商在 Claude Desktop 直连场景实测不可用，需要通过 Switch++ 本地网关完成模型映射、请求预检和兼容处理。",
 );
+equal(gatewayRequirementForProfile("claude_desktop", baseGatewayProfile).label, "无需开启");
+equal(gatewayRequirementForProfile("claude_desktop", baseGatewayProfile).cornerLabel, "无需");
+equal(
+  gatewayRequirementForProfile("claude_desktop", baseGatewayProfile).detail,
+  "该厂商 Anthropic 兼容端点已实测可由 Claude 直连使用，不需要开启 Switch++ 本地网关；需要调用记录、模型映射或请求清洗时再开启网关。",
+);
+equal(gatewayRequirementForProfile("claude_desktop", { ...minimaxClaudeProfile, compat_mode: "direct" }).label, "建议开启");
 
 equal(
   gatewayRequirementForTarget("claude_cli", [directClaudeProfile, directThirdPartyClaudeProfile], directThirdPartyClaudeProfile.id).label,
-  "建议开启",
+  "必须开启",
 );
 equal(
   gatewayRequirementForTarget("claude_cli", [directClaudeProfile, baseGatewayProfile], directClaudeProfile.id).label,
-  "建议开启",
+  "无需开启",
 );
 equal(
   gatewayRequirementForTarget("claude_cli", [directClaudeProfile, baseGatewayProfile], baseGatewayProfile.id).label,
+  "必须开启",
+);
+equal(
+  gatewayRequirementForTarget("claude_cli", [directClaudeProfile, genericDirectThirdPartyClaudeProfile], directClaudeProfile.id).label,
   "建议开启",
 );
 equal(

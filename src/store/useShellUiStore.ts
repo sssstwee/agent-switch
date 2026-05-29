@@ -2,12 +2,9 @@ import { create } from "zustand";
 import {
   LANGUAGE_STORAGE_KEY,
   LEGACY_LANGUAGE_STORAGE_KEYS,
-  LEGACY_SIDEBAR_COLLAPSED_STORAGE_KEYS,
   LEGACY_SIDEBAR_WIDTH_STORAGE_KEYS,
-  SIDEBAR_COLLAPSED_STORAGE_KEY,
-  SIDEBAR_COLLAPSE_WIDTH,
   SIDEBAR_DEFAULT_WIDTH,
-  SIDEBAR_LEGACY_DEFAULT_WIDTH,
+  SIDEBAR_LEGACY_DEFAULT_WIDTHS,
   SIDEBAR_WIDTH_STORAGE_KEY,
   type AppLanguage,
 } from "../appConstants.ts";
@@ -29,15 +26,12 @@ type ShellUiStore = {
   language: AppLanguage;
   settingsPopoverOpen: boolean;
   settingsPopoverAnchor: SettingsPopoverAnchor;
-  sidebarCollapsed: boolean;
   sidebarWidth: number;
   showStatus: (message: string, type?: StatusType) => void;
   clearStatus: () => void;
   setLanguage: (value: AppLanguage) => void;
   setSettingsPopoverOpen: (value: StateUpdater<boolean>) => void;
   setSettingsPopoverAnchor: (value: SettingsPopoverAnchor) => void;
-  setSidebarCollapsed: (value: StateUpdater<boolean>) => void;
-  setSidebarWidth: (value: StateUpdater<number>) => void;
 };
 
 function readLocalStorage(key: string) {
@@ -73,15 +67,9 @@ function readInitialLanguage() {
   return normalizeLanguage(readMigratedLocalStorage(LANGUAGE_STORAGE_KEY, LEGACY_LANGUAGE_STORAGE_KEYS));
 }
 
-function readInitialSidebarCollapsed() {
-  if (readMigratedLocalStorage(SIDEBAR_COLLAPSED_STORAGE_KEY, LEGACY_SIDEBAR_COLLAPSED_STORAGE_KEYS) === "1") return true;
-  const storedWidth = Number(readMigratedLocalStorage(SIDEBAR_WIDTH_STORAGE_KEY, LEGACY_SIDEBAR_WIDTH_STORAGE_KEYS));
-  return Number.isFinite(storedWidth) && storedWidth > 0 && storedWidth <= SIDEBAR_COLLAPSE_WIDTH;
-}
-
 function readInitialSidebarWidth() {
   const storedWidth = Number(readMigratedLocalStorage(SIDEBAR_WIDTH_STORAGE_KEY, LEGACY_SIDEBAR_WIDTH_STORAGE_KEYS));
-  if (storedWidth === SIDEBAR_LEGACY_DEFAULT_WIDTH) {
+  if (SIDEBAR_LEGACY_DEFAULT_WIDTHS.includes(storedWidth)) {
     writeLocalStorage(SIDEBAR_WIDTH_STORAGE_KEY, String(SIDEBAR_DEFAULT_WIDTH));
     return SIDEBAR_DEFAULT_WIDTH;
   }
@@ -94,7 +82,6 @@ export const useShellUiStore = create<ShellUiStore>((set) => ({
   language: readInitialLanguage(),
   settingsPopoverOpen: false,
   settingsPopoverAnchor: { left: 24, bottom: 56 },
-  sidebarCollapsed: readInitialSidebarCollapsed(),
   sidebarWidth: readInitialSidebarWidth(),
   showStatus: (status, statusType = "") => set({ status, statusType }),
   clearStatus: () => set({ status: "", statusType: "" }),
@@ -106,14 +93,4 @@ export const useShellUiStore = create<ShellUiStore>((set) => ({
     settingsPopoverOpen: typeof value === "function" ? value(state.settingsPopoverOpen) : value,
   })),
   setSettingsPopoverAnchor: (settingsPopoverAnchor) => set({ settingsPopoverAnchor }),
-  setSidebarCollapsed: (value) => set((state) => {
-    const sidebarCollapsed = typeof value === "function" ? value(state.sidebarCollapsed) : value;
-    writeLocalStorage(SIDEBAR_COLLAPSED_STORAGE_KEY, sidebarCollapsed ? "1" : "0");
-    return { sidebarCollapsed };
-  }),
-  setSidebarWidth: (value) => set((state) => {
-    const sidebarWidth = typeof value === "function" ? value(state.sidebarWidth) : value;
-    writeLocalStorage(SIDEBAR_WIDTH_STORAGE_KEY, String(sidebarWidth));
-    return { sidebarWidth };
-  }),
 }));

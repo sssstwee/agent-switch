@@ -6,7 +6,7 @@ import type {
   TargetKey,
 } from "./appTypes.ts";
 import type { GatewayRequirement } from "./gatewayRequirement.ts";
-import { gatewayProfileUsesProxyForTarget } from "./gatewayProfile.ts";
+import { gatewayProfileUsesProxyForTarget, isOfficialAnthropicBaseUrl } from "./gatewayProfile.ts";
 
 export const apiFormatLabels: Record<ApiFormat, string> = {
   anthropic: "Anthropic Messages",
@@ -26,7 +26,7 @@ export const authFieldLabels: Record<AuthField, string> = {
 export function codexCompatModeLabel(profile: Pick<CodexProfile, "compat_mode" | "api_format" | "connection_mode">) {
   if (profile.connection_mode === "official") return "官方登录";
   const mode = profile.compat_mode ?? "proxy";
-  if (mode === "direct") return "厂商连接";
+  if (mode === "direct") return "直连";
   return "本地网关";
 }
 
@@ -40,7 +40,7 @@ export function gatewayCompatModeLabel(profile: Pick<GatewayProfile, "compat_mod
   if (target === "claude_desktop" && gatewayProfileUsesProxyForTarget(profile as GatewayProfile, target)) {
     return "本地网关";
   }
-  return "厂商连接";
+  return "直连";
 }
 
 export function gatewayRequirementIconClass(requirement: GatewayRequirement) {
@@ -62,6 +62,21 @@ export function profileModelName(profile: GatewayProfile | CodexProfile) {
   return profile.upstream_model || profile.provider_model_map?.main || profile.model_map.main || profile.models[0]?.name || "";
 }
 
+function isOfficialCodexProfile(profile: CodexProfile) {
+  return profile.connection_mode === "official" || profile.base_url.trim().toLowerCase().includes("api.openai.com");
+}
+
+function isOfficialGatewayProfile(profile: GatewayProfile) {
+  return isOfficialAnthropicBaseUrl(profile.base_url);
+}
+
+export function profileRouteStatusLabel(profile: GatewayProfile | CodexProfile) {
+  if ("connection_mode" in profile) {
+    return isOfficialCodexProfile(profile) ? "官方" : "网关";
+  }
+  return isOfficialGatewayProfile(profile) ? "官方" : "网关";
+}
+
 export function profileCompatModeMeta(profile: GatewayProfile | CodexProfile, target?: TargetKey) {
   if ("connection_mode" in profile) {
     return codexCompatModeLabel(profile);
@@ -69,10 +84,7 @@ export function profileCompatModeMeta(profile: GatewayProfile | CodexProfile, ta
   return gatewayCompatModeLabel(profile, target);
 }
 
-export function profileConfigMeta(profile: GatewayProfile | CodexProfile, target?: TargetKey) {
+export function profileConfigMeta(profile: GatewayProfile | CodexProfile) {
   const model = profileModelName(profile) || "未填写";
-  if ("connection_mode" in profile) {
-    return `模型: ${model} · ${codexCompatModeLabel(profile)}`;
-  }
-  return `模型: ${model} · ${gatewayCompatModeLabel(profile, target)}`;
+  return `模型: ${model} · ${profileRouteStatusLabel(profile)}`;
 }

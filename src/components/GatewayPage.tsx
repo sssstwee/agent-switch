@@ -8,7 +8,7 @@ import { resolveGatewaySnapshotBase, gatewayScopeLabel, appliedProxyProfileForTa
 import { isCodexProfile, isCodexTarget, targetDisplayName } from "./gatewayHelpers.ts";
 import { gatewayProxyTargetOptions } from "../targetOptions.ts";
 import { translateUiText } from "../i18n/uiTranslation.ts";
-import { Button, Card } from "../nativeUi.tsx";
+import { Button, Card, Switch } from "../nativeUi.tsx";
 import { formatProxyNumber, formatProxyTokenK, formatProxyTokenTooltip, formatProxyTimestamp } from "./GatewayProxyPanel.tsx";
 
 const GatewayOverviewChart = lazy(() =>
@@ -238,6 +238,17 @@ function GatewayDetailContent({
     : snapshot.targetKey === "claude_cli" || isCodexDirectProfile(snapshot.profile)
       ? `${gatewayClientName} 当前不会请求本地兼容网关。`
       : `${gatewayClientName} 当前未通过本地兼容网关转发。`;
+  const gatewaySwitchLabel = codexProxyBusy
+    ? snapshot.running ? "关闭中" : "开启中"
+    : snapshot.running ? "已开启" : "已关闭";
+
+  function handleGatewaySwitchChange(enabled: boolean) {
+    if (enabled) {
+      onStartProxy(snapshot.targetKey);
+    } else {
+      onStopProxy(snapshot.targetKey);
+    }
+  }
 
   return (
     <div className="ccr-codex-proxy-detail">
@@ -247,30 +258,17 @@ function GatewayDetailContent({
           <span>{gatewayStateDescription}</span>
         </div>
         <div className="ccr-codex-proxy-actions">
-          {snapshot.running ? (
-            <button
-              className={codexProxyBusy ? "ccr-proxy-action-btn danger busy" : "ccr-proxy-action-btn danger"}
-              type="button"
-              onClick={() => onStopProxy(snapshot.targetKey)}
-              disabled={codexProxyBusy}
-              aria-label="关闭兼容网关"
-            >
-              <span className="ccr-proxy-action-icon" aria-hidden="true" />
-              {codexProxyBusy ? "关闭中" : "关闭"}
-            </button>
-          ) : (
-            <button
-              className={codexProxyBusy ? "ccr-proxy-action-btn start busy" : "ccr-proxy-action-btn start"}
-              type="button"
-              onClick={() => onStartProxy(snapshot.targetKey)}
-              disabled={codexProxyBusy || !snapshot.hasProfile}
-              title={startTitle}
-              aria-label="开启兼容网关"
-            >
-              <span className="ccr-proxy-action-icon" aria-hidden="true" />
-              {codexProxyBusy ? "开启中" : "开启"}
-            </button>
-          )}
+          <Switch
+            className="ccr-proxy-action-switch"
+            isSelected={snapshot.running}
+            onChange={handleGatewaySwitchChange}
+            disabled={codexProxyBusy || (!snapshot.running && !snapshot.hasProfile)}
+            title={snapshot.running ? "关闭兼容网关" : startTitle}
+            aria-label={snapshot.running ? "关闭兼容网关" : "开启兼容网关"}
+            size="sm"
+          >
+            {gatewaySwitchLabel}
+          </Switch>
         </div>
       </div>
       <div className="ccr-codex-proxy-tabs" role="tablist" aria-label="兼容网关详情">

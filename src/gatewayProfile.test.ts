@@ -142,8 +142,8 @@ const deepseekDirectProfile: GatewayProfile = {
   api_format: "anthropic",
   compat_mode: "direct",
 };
-equal(gatewayProfileUsesProxyForTarget(deepseekDirectProfile, "claude_cli"), false);
-equal(gatewayProfileUsesProxyForTarget(deepseekDirectProfile, "claude_desktop"), true);
+equal(gatewayProfileUsesProxyForTarget(deepseekDirectProfile, "claude_cli"), true);
+equal(gatewayProfileUsesProxyForTarget(deepseekDirectProfile, "claude_desktop"), false);
 
 equal(resolveGatewayUpstreamModel(baseProfile, preset), "deepseek-v4-pro");
 equal(extractTomlAssignment('model = "gpt-5.5"\nmodel_provider = "openai"', "model"), "gpt-5.5");

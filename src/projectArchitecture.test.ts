@@ -33,9 +33,9 @@ test("uiTranslation module exports expected functions", async () => {
 
 test("appConstants exports expected constants", async () => {
   const mod = await import("./appConstants.ts");
-  assert.equal(mod.SIDEBAR_DEFAULT_WIDTH, 215);
-  assert.equal(mod.SIDEBAR_MIN_WIDTH, 128);
-  assert.equal(mod.SIDEBAR_MAX_WIDTH, 360);
+  assert.equal(mod.SIDEBAR_DEFAULT_WIDTH, 224);
+  assert.equal(mod.SIDEBAR_MIN_WIDTH, 224);
+  assert.equal(mod.SIDEBAR_MAX_WIDTH, 224);
   assert.equal(mod.DEFAULT_ENV_CARD_KEY, "codex_cli");
 });
 
@@ -53,10 +53,11 @@ test("public branding uses Switch++ naming", () => {
   assert.equal(tauriConfig.mainBinaryName, "Switch++");
   assert.equal(tauriConfig.bundle.macOS.bundleName, "Switch++");
   assert.equal(tauriConfig.app.trayIcon.tooltip, "Switch++");
+  assert.equal(tauriConfig.app.trayIcon.iconPath, "icons/tray-template.png");
   assert.equal(tauriConfig.app.trayIcon.iconAsTemplate, true);
-  assert.deepEqual(tauriConfig.bundle.resources, ["icons/32x32.png"]);
-  assert.match(cargoToml, /features = \[ "tray-icon", "image-png"\]/);
-  assert.equal(packageJson.scripts.dev, "tauri dev --runner ../scripts/tauri-dev-runner.sh");
+  assert.deepEqual(tauriConfig.bundle.resources, ["icons/32x32.png", "icons/tray-template.png"]);
+  assert.match(cargoToml, /features = \["macos-private-api", "tray-icon", "image-png"\]/);
+  assert.equal(packageJson.scripts.dev, 'PATH="$HOME/.cargo/bin:$PATH" tauri dev --runner ../scripts/tauri-dev-runner.sh');
   assert.match(cargoToml, /^name = "switchpp"$/m);
   assert.match(cargoToml, /^name = "agent_switch_lib"$/m);
   assert.equal(packageJson.homepage, "https://sssstwee.github.io/switch-plus-plus/");
@@ -116,6 +117,7 @@ test("Tauri build script reruns when app icons change", () => {
   const buildRs = readSource("../src-tauri/build.rs");
 
   assert.equal(buildRs.includes("cargo:rerun-if-changed=icons/32x32.png"), true);
+  assert.equal(buildRs.includes("cargo:rerun-if-changed=icons/tray-template.png"), true);
   assert.equal(buildRs.includes("cargo:rerun-if-changed=icons/icon.png"), true);
   assert.equal(buildRs.includes("cargo:rerun-if-changed=icons/icon.icns"), true);
   assert.equal(buildRs.includes("cargo:rerun-if-changed=icons/icon.ico"), true);
@@ -124,7 +126,7 @@ test("Tauri build script reruns when app icons change", () => {
 test("macOS tray icon is explicitly installed as a template image", () => {
   const appShell = readSource("../.private/agent-switch-private-core/src-tauri-core/src/app_shell.rs");
 
-  assert.equal(appShell.includes("include_bytes!(concat!(env!(\"CARGO_MANIFEST_DIR\"), \"/icons/32x32.png\"))"), true);
+  assert.equal(appShell.includes("include_bytes!(concat!(env!(\"CARGO_MANIFEST_DIR\"), \"/icons/tray-template.png\"))"), true);
   assert.equal(appShell.includes("fn bundled_tray_icon()"), true);
   assert.equal(appShell.includes("set_icon_with_as_template(Some(icon), true)"), true);
   assert.equal(appShell.includes(".icon_as_template(true)"), true);
@@ -285,10 +287,12 @@ test("App delegates app shell chrome behavior to a feature hook", () => {
 
   assert.equal(existsSync(hookUrl), true);
   const hookSource = readSource("./features/app-shell/useAppShellChrome.ts");
-  assert.equal(hookSource.includes("function handleSidebarResizePointerDown"), true);
+  assert.equal(hookSource.includes("function handleSidebarResizePointerDown"), false);
+  assert.equal(hookSource.includes("function toggleSidebarCollapsed"), false);
   assert.equal(hookSource.includes("function runAppUpdateCheck"), true);
   assert.equal(hookSource.includes("function startWindowDrag"), true);
   assert.equal(appTsx.includes("function handleSidebarResizePointerDown"), false);
+  assert.equal(appTsx.includes("function toggleSidebarCollapsed"), false);
   assert.equal(appTsx.includes("function runAppUpdateCheck"), false);
   assert.equal(appTsx.includes("function startWindowDrag"), false);
 });
@@ -300,7 +304,7 @@ test("App delegates sidebar chrome markup to an app shell component", () => {
   assert.equal(existsSync(sidebarUrl), true);
   const sidebarSource = readSource("./features/app-shell/AppSidebar.tsx");
   assert.equal(sidebarSource.includes("function AppSidebar"), true);
-  assert.equal(sidebarSource.includes("ccr-sidebar-resize-handle"), true);
+  assert.equal(sidebarSource.includes("ccr-sidebar-resize-handle"), false);
   assert.equal(sidebarSource.includes("ccr-settings-popover"), true);
   assert.equal(appTsx.includes("<aside className=\"ccr-sidebar\">"), false);
   assert.equal(appTsx.includes("ccr-settings-popover-layer"), false);

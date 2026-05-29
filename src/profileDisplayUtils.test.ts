@@ -52,15 +52,15 @@ function gatewayProfile(overrides: Partial<GatewayProfile>): GatewayProfile {
   };
 }
 
-equal(profileConfigMeta(codexProfile({})), "模型: qwen3.6-plus · 本地网关");
-equal(profileConfigMeta(codexProfile({ compat_mode: "proxy", api_format: "openai_chat" })), "模型: qwen3.6-plus · 本地网关");
-equal(profileConfigMeta(codexProfile({ compat_mode: "direct" })), "模型: qwen3.6-plus · 厂商连接");
-equal(profileConfigMeta(codexProfile({ connection_mode: "official", compat_mode: "direct" })), "模型: qwen3.6-plus · 官方登录");
-equal(profileConfigMeta(gatewayProfile({})), "模型: claude-sonnet-4-6 · 厂商连接");
-equal(profileConfigMeta(gatewayProfile({ compat_mode: "proxy" })), "模型: claude-sonnet-4-6 · 本地网关");
+equal(profileConfigMeta(codexProfile({})), "模型: qwen3.6-plus · 网关");
+equal(profileConfigMeta(codexProfile({ compat_mode: "proxy", api_format: "openai_chat" })), "模型: qwen3.6-plus · 网关");
+equal(profileConfigMeta(codexProfile({ compat_mode: "direct" })), "模型: qwen3.6-plus · 网关");
+equal(profileConfigMeta(codexProfile({ connection_mode: "official", compat_mode: "direct" })), "模型: qwen3.6-plus · 官方");
+equal(profileConfigMeta(gatewayProfile({})), "模型: claude-sonnet-4-6 · 网关");
+equal(profileConfigMeta(gatewayProfile({ compat_mode: "proxy" })), "模型: claude-sonnet-4-6 · 网关");
 equal(
   profileConfigMeta(gatewayProfile({ compat_mode: "proxy", api_format: "openai_chat" })),
-  "模型: claude-sonnet-4-6 · 本地网关",
+  "模型: claude-sonnet-4-6 · 网关",
 );
 equal(
   profileConfigMeta(
@@ -69,9 +69,8 @@ equal(
       compat_mode: "direct",
       provider_model_map: defaultModelMap("MiniMax-M2.7"),
     }),
-    "claude_desktop",
   ),
-  "模型: MiniMax-M2.7 · 本地网关",
+  "模型: MiniMax-M2.7 · 网关",
 );
 equal(
   profileConfigMeta(
@@ -79,9 +78,8 @@ equal(
       base_url: "https://api.anthropic.com",
       compat_mode: "direct",
     }),
-    "claude_desktop",
   ),
-  "模型: claude-sonnet-4-6 · 厂商连接",
+  "模型: claude-sonnet-4-6 · 官方",
 );
 
 for (const source of [
@@ -92,10 +90,9 @@ for (const source of [
   profileConfigMeta(
     gatewayProfile({
       base_url: "https://api.minimaxi.com/anthropic",
-      compat_mode: "direct",
+      compat_mode: "proxy",
       provider_model_map: defaultModelMap("MiniMax-M2.7"),
     }),
-    "claude_desktop",
   ),
 ]) {
   if (/网关透传|网关直连|网关直通|网关转换|桌面网关映射|桌面网关转换/.test(source)) {

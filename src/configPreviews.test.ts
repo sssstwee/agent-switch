@@ -181,6 +181,7 @@ equal(buildGatewayModels(defaultModelMap("moonshot-v1-1m"))[0]?.supports_1m, tru
 const autoCompactClaudePreview = buildGatewayConfigPreview({
   ...baseCodexForm,
   display_name: "DeepSeek",
+  base_url: "https://api.deepseek.com/anthropic",
   api_format: "anthropic",
   auth_field: "ANTHROPIC_AUTH_TOKEN",
   model: "deepseek-v4-pro",
@@ -202,6 +203,7 @@ includes(autoCompactClaudePreview, '"ANTHROPIC_DEFAULT_HAIKU_MODEL": "deepseek-v
 const deepseekClaudePreviewWithUserOverrideOff = buildGatewayConfigPreview({
   ...baseCodexForm,
   display_name: "DeepSeek",
+  base_url: "https://api.deepseek.com/anthropic",
   api_format: "anthropic",
   auth_field: "ANTHROPIC_AUTH_TOKEN",
   model: "deepseek-v4-pro",
@@ -215,6 +217,7 @@ excludes(deepseekClaudePreviewWithUserOverrideOff, "deepseek-v4-pro[1m]");
 const manual1mClaudePreview = buildGatewayConfigPreview({
   ...baseCodexForm,
   display_name: "自定义模型",
+  base_url: "https://example.com/anthropic",
   api_format: "anthropic",
   auth_field: "ANTHROPIC_AUTH_TOKEN",
   model: "vendor-custom-long-context",
@@ -226,6 +229,21 @@ const manual1mClaudePreview = buildGatewayConfigPreview({
 includes(manual1mClaudePreview, '"ANTHROPIC_MODEL": "vendor-custom-long-context[1m]"');
 includes(manual1mClaudePreview, '"ANTHROPIC_DEFAULT_OPUS_MODEL": "vendor-custom-long-context[1m]"');
 includes(manual1mClaudePreview, '"ANTHROPIC_DEFAULT_SONNET_MODEL": "vendor-custom-long-context[1m]"');
+
+const bailianClaudePreviewWithStale1mOverride = buildGatewayConfigPreview({
+  ...baseCodexForm,
+  display_name: "阿里百炼",
+  base_url: "https://dashscope.aliyuncs.com/apps/anthropic",
+  api_format: "anthropic",
+  auth_field: "ANTHROPIC_AUTH_TOKEN",
+  model: "qwen3.6-plus",
+  model_map: defaultModelMap("qwen3.6-plus"),
+  supports_1m_context: true,
+  config_options: {} as AddForm["config_options"],
+});
+
+includes(bailianClaudePreviewWithStale1mOverride, '"ANTHROPIC_MODEL": "qwen3.6-plus"');
+excludes(bailianClaudePreviewWithStale1mOverride, "qwen3.6-plus[1m]");
 
 const stableClaudePreview = buildGatewayConfigPreview({
   ...baseCodexForm,
@@ -280,9 +298,9 @@ const directThirdPartyDesktopPreview = buildClaudeDesktopProfileConfigPreview({
 });
 
 includes(directThirdPartyDesktopPreview, '"agentSwitchClient": "Claude Desktop"');
-includes(directThirdPartyDesktopPreview, '"agentSwitchRoute": "local_gateway"');
+includes(directThirdPartyDesktopPreview, '"agentSwitchRoute": "direct"');
 includes(directThirdPartyDesktopPreview, '"agentSwitchUpstreamBaseUrl": "https://api.minimaxi.com/anthropic"');
-includes(directThirdPartyDesktopPreview, '"inferenceGatewayBaseUrl": "http://127.0.0.1:23457/anthropic/desktop"');
+includes(directThirdPartyDesktopPreview, '"inferenceGatewayBaseUrl": "https://api.minimaxi.com/anthropic"');
 includes(directThirdPartyDesktopPreview, '"agentSwitchUpstreamModel": "MiniMax-M2.7"');
 
 const bypassPermissionsDesktopPreview = buildClaudeDesktopProfileConfigPreview({

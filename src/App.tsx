@@ -144,7 +144,7 @@ import {
   codexCompatModeLabel,
   formatCheckTime,
   profileModelName,
-  profileCompatModeMeta,
+  profileRouteStatusLabel,
 } from "./profileDisplayUtils.ts";
 import { Button, Card, Chip, Input, Switch, Tooltip } from "./nativeUi.tsx";
 import { reorderProfilesById } from "./profileOrdering.ts";
@@ -159,15 +159,10 @@ import {
   isOfficialAnthropicBaseUrl,
   validateProviderModelMap,
 } from "./gatewayProfile.ts";
-import {
-  gatewayRequirementForProfile,
-  type GatewayRequirement,
-} from "./gatewayRequirement.ts";
 import { useEnvCheckStore } from "./store/useEnvCheckStore.ts";
 import { useGatewayStore } from "./store/useGatewayStore.ts";
 
 import {
-  SIDEBAR_TEXT_ONLY_WIDTH,
   ENV_OPERATION_PROGRESS_EVENT,
   ENV_CHECK_CARD_ORDER,
   DEFAULT_ENV_CARD_KEY,
@@ -183,7 +178,6 @@ import {
 import { AddressVariantSwitch } from "./components/AddressVariantSwitch.tsx";
 import { CodexConfigPanel } from "./components/CodexConfigPanel.tsx";
 import { GatewayConfigOptionsPanel } from "./components/GatewayConfigOptionsPanel.tsx";
-import { GatewayRequirementIcon } from "./components/GatewayRequirementIcon.tsx";
 import { ModelDiscoveryField } from "./components/ModelDiscoveryField.tsx";
 import { OfficialCodexModelField } from "./components/OfficialCodexModelField.tsx";
 import { OneMillionContextField } from "./components/OneMillionContextField.tsx";
@@ -204,6 +198,11 @@ import { useAppUiStore } from "./store/useAppUiStore.ts";
 import { useShellUiStore } from "./store/useShellUiStore.ts";
 
 const McpSkillsView = lazy(() => import("./McpSkillsView.tsx"));
+const PROFILE_DISPLAY_NAME_MAX_LENGTH = 15;
+
+function limitProfileDisplayName(value: string) {
+  return Array.from(value).slice(0, PROFILE_DISPLAY_NAME_MAX_LENGTH).join("");
+}
 
 function envCheckCardSortIndex(key: string) {
   const index = ENV_CHECK_CARD_ORDER.indexOf(key as EnvCheckCardKey);
@@ -260,30 +259,24 @@ function App() {
     language,
     settingsPopoverOpen,
     settingsPopoverAnchor,
-    sidebarCollapsed,
     sidebarWidth,
     showStatus,
     clearStatus,
     setLanguage,
     setSettingsPopoverOpen,
     setSettingsPopoverAnchor,
-    setSidebarCollapsed,
-    setSidebarWidth,
   } = useShellUiStore(useShallow((shellState) => ({
     status: shellState.status,
     statusType: shellState.statusType,
     language: shellState.language,
     settingsPopoverOpen: shellState.settingsPopoverOpen,
     settingsPopoverAnchor: shellState.settingsPopoverAnchor,
-    sidebarCollapsed: shellState.sidebarCollapsed,
     sidebarWidth: shellState.sidebarWidth,
     showStatus: shellState.showStatus,
     clearStatus: shellState.clearStatus,
     setLanguage: shellState.setLanguage,
     setSettingsPopoverOpen: shellState.setSettingsPopoverOpen,
     setSettingsPopoverAnchor: shellState.setSettingsPopoverAnchor,
-    setSidebarCollapsed: shellState.setSidebarCollapsed,
-    setSidebarWidth: shellState.setSidebarWidth,
   })));
   const textNodeOriginalsRef = useRef<WeakMap<Text, string>>(new WeakMap());
   const elementAttributeOriginalsRef = useRef<WeakMap<Element, Partial<Record<typeof translatedAttributes[number], string>>>>(new WeakMap());
@@ -408,17 +401,11 @@ function App() {
 
   const {
     appUpdate,
-    handleSidebarResizePointerDown,
     openAppUpdateRelease,
     settingsButtonRef,
     startWindowDrag,
     toggleSettingsPopover,
-    toggleSidebarCollapsed,
   } = useAppShellChrome({
-    sidebarCollapsed,
-    sidebarWidth,
-    setSidebarCollapsed,
-    setSidebarWidth,
     setSettingsPopoverAnchor,
     setSettingsPopoverOpen,
     showStatus,
@@ -1214,14 +1201,10 @@ function App() {
       const proxyTarget = targetKey ?? (isProxyTarget(target) ? target : resolveGatewaySelectedTarget());
       const next = await nativeApi.startCodexProxy(proxyTarget);
       setCodexProxyStatus(next);
-      if (proxyTarget === "codex" || proxyTarget === "claude_cli") {
-        const refreshed = await nativeApi.loadAppState();
-        setState(refreshed);
-        if (proxyTarget === "claude_cli") refreshClaudeCliEditFormFromState(refreshed);
-        showStatus(`${targetDisplayName(proxyTarget)} 已切换为本地兼容网关。`, "success");
-      } else {
-        showStatus(`${targetDisplayName(proxyTarget)} 兼容网关已开启。`, "success");
-      }
+      const refreshed = await nativeApi.loadAppState();
+      setState(refreshed);
+      if (proxyTarget === "claude_cli") refreshClaudeCliEditFormFromState(refreshed);
+      showStatus(`${targetDisplayName(proxyTarget)} 已切换为本地兼容网关。`, "success");
     } catch (error) {
       showStatus(`开启兼容网关失败：${String(error)}`, "error");
     } finally {
@@ -1235,31 +1218,14 @@ function App() {
       const proxyTarget = targetKey ?? (isProxyTarget(target) ? target : resolveGatewaySelectedTarget());
       const next = await nativeApi.stopCodexProxy(proxyTarget);
       setCodexProxyStatus(next);
-      if (proxyTarget === "codex" || proxyTarget === "claude_cli") {
-        const refreshed = await nativeApi.loadAppState();
-        setState(refreshed);
-        if (proxyTarget === "claude_cli") refreshClaudeCliEditFormFromState(refreshed);
-        showStatus(`${targetDisplayName(proxyTarget)} 已切换为厂商连接，兼容网关已关闭。`, "success");
-      } else {
-        showStatus(`${targetDisplayName(proxyTarget)} 兼容网关已关闭。`, "success");
-      }
+      const refreshed = await nativeApi.loadAppState();
+      setState(refreshed);
+      if (proxyTarget === "claude_cli") refreshClaudeCliEditFormFromState(refreshed);
+      showStatus(`${targetDisplayName(proxyTarget)} 已切换为直连，兼容网关已关闭。`, "success");
     } catch (error) {
       showStatus(`关闭兼容网关失败：${String(error)}`, "error");
     } finally {
       setCodexProxyBusy(false);
-    }
-  }
-
-  async function toggleProfileGateway(profileId: string, enabled: boolean) {
-    if (!state || !isProxyTarget(target)) return;
-    if (state.applied[target] !== profileId) {
-      showStatus("请先应用此配置，再开启兼容网关。", "error");
-      return;
-    }
-    if (enabled) {
-      await startCodexProxy(target);
-    } else {
-      await stopCodexProxy(target);
     }
   }
 
@@ -1307,7 +1273,7 @@ function App() {
       const applied = await nativeApi.applyTargetProfile(applyTarget, profileId, stateForApply);
       setState(applied);
       void loadCodexProxyStatus();
-      showStatus(`${targetDisplayName(applyTarget)} 配置已写入磁盘，重启 ${targetDisplayName(applyTarget)} 后生效。`, "success");
+      showStatus(`${targetDisplayName(applyTarget)} 配置已写入，重启 ${targetDisplayName(applyTarget)} 后生效。`, "success");
     } catch (error) {
       showStatus(`应用失败：${String(error)}`, "error");
     } finally {
@@ -1748,48 +1714,55 @@ function App() {
 
     if (isCodexTarget(target)) {
       const key = target;
-      const resolvedToml = formForSubmit.connection_mode === "official"
+      const submittedCompatMode: CodexCompatMode = formForSubmit.connection_mode === "official"
+        || formForSubmit.base_url.trim().toLowerCase().includes("api.openai.com")
+        ? "direct"
+        : "proxy";
+      const codexFormForSubmit = formForSubmit.connection_mode === "official"
+        ? formForSubmit
+        : { ...formForSubmit, compat_mode: submittedCompatMode };
+      const resolvedToml = codexFormForSubmit.connection_mode === "official"
         ? mergeCodexConfigOptionsIntoToml(
-            mergeCodexOfficialModelIntoToml(formForSubmit.config_toml, formForSubmit.model),
-            normalizeCodexConfigOptions(formForSubmit.codex_config_options),
+            mergeCodexOfficialModelIntoToml(codexFormForSubmit.config_toml, codexFormForSubmit.model),
+            normalizeCodexConfigOptions(codexFormForSubmit.codex_config_options),
           )
-        : buildCodexConfigTomlTemplate(formForSubmit, currentSelectedPreset);
-      const resolvedAuthJson = formForSubmit.connection_mode === "official"
-        ? formForSubmit.auth_json
+        : buildCodexConfigTomlTemplate(codexFormForSubmit, currentSelectedPreset);
+      const resolvedAuthJson = codexFormForSubmit.connection_mode === "official"
+        ? codexFormForSubmit.auth_json
         : buildCodexAuthJsonTemplate(
-            formForSubmit.api_key,
-            formForSubmit.compat_mode === "proxy",
+            codexFormForSubmit.api_key,
+            codexFormForSubmit.compat_mode === "proxy",
           );
-      const resolvedModel = formForSubmit.connection_mode === "official"
-        ? (formForSubmit.model || extractTomlAssignment(resolvedToml, "model") || formForSubmit.model_map.main || "gpt-5.5")
-        : (extractTomlAssignment(resolvedToml, "model") || formForSubmit.model || formForSubmit.model_map.main || "gpt-5.5");
+      const resolvedModel = codexFormForSubmit.connection_mode === "official"
+        ? (codexFormForSubmit.model || extractTomlAssignment(resolvedToml, "model") || codexFormForSubmit.model_map.main || "gpt-5.5")
+        : (extractTomlAssignment(resolvedToml, "model") || codexFormForSubmit.model || codexFormForSubmit.model_map.main || "gpt-5.5");
       const profileId = isEditMode
         ? editingProfile!.id
         : crypto.randomUUID();
       submittedProfileId = profileId;
-      const catalogJson = formForSubmit.connection_mode === "official"
+      const catalogJson = codexFormForSubmit.connection_mode === "official"
         ? undefined
-        : buildCodexModelCatalogPreview(formForSubmit, providerModelCandidates.length > 0 ? providerModelCandidates : undefined);
+        : buildCodexModelCatalogPreview(codexFormForSubmit, providerModelCandidates.length > 0 ? providerModelCandidates : undefined);
       const profile: CodexProfile = {
         id: profileId,
         display_name: name,
-        website_url: formForSubmit.website_url,
-        note: formForSubmit.note,
-        connection_mode: formForSubmit.connection_mode,
-        compat_mode: formForSubmit.compat_mode,
-        api_format: formForSubmit.api_format,
-        base_url: formForSubmit.connection_mode === "official" ? "" : (formForSubmit.base_url || "https://api.openai.com/v1"),
-        api_key: formForSubmit.connection_mode === "official" ? "" : formForSubmit.api_key,
+        website_url: codexFormForSubmit.website_url,
+        note: codexFormForSubmit.note,
+        connection_mode: codexFormForSubmit.connection_mode,
+        compat_mode: codexFormForSubmit.compat_mode,
+        api_format: codexFormForSubmit.api_format,
+        base_url: codexFormForSubmit.connection_mode === "official" ? "" : (codexFormForSubmit.base_url || "https://api.openai.com/v1"),
+        api_key: codexFormForSubmit.connection_mode === "official" ? "" : codexFormForSubmit.api_key,
         model: resolvedModel,
         models: providerModelCandidates.length > 0 ? providerModelCandidates : [resolvedModel],
         auth_json: resolvedAuthJson,
         config_toml: resolvedToml,
         model_catalog_json: catalogJson,
-        hide_think_blocks: formForSubmit.connection_mode === "official" ? false : formForSubmit.hide_think_blocks,
-        supports_1m_context: formForSubmit.connection_mode === "official" ? false : Boolean(formForSubmit.supports_1m_context),
-        codex_config_options: formForSubmit.connection_mode === "official"
-          ? normalizeCodexConfigOptions(formForSubmit.codex_config_options)
-          : sanitizeCodexConfigOptionsForForm(formForSubmit, currentSelectedPreset),
+        hide_think_blocks: codexFormForSubmit.connection_mode === "official" ? false : codexFormForSubmit.hide_think_blocks,
+        supports_1m_context: codexFormForSubmit.connection_mode === "official" ? false : Boolean(codexFormForSubmit.supports_1m_context),
+        codex_config_options: codexFormForSubmit.connection_mode === "official"
+          ? normalizeCodexConfigOptions(codexFormForSubmit.codex_config_options)
+          : sanitizeCodexConfigOptionsForForm(codexFormForSubmit, currentSelectedPreset),
         updated_at: Date.now(),
       };
       nextState = {
@@ -1807,6 +1780,7 @@ function App() {
       const resolvedConfigOptions = supportsNativeApply(target)
         ? formForSubmit.config_options
         : { ...formForSubmit.config_options, write_general_config: false };
+      const submittedCompatMode: CodexCompatMode = isOfficialAnthropicBaseUrl(formForSubmit.base_url) ? "direct" : "proxy";
       const profile: GatewayProfile = {
         id: profileId,
         display_name: name,
@@ -1817,7 +1791,7 @@ function App() {
         api_format: formForSubmit.api_format,
         auth_field: formForSubmit.auth_field,
         use_full_url: formForSubmit.use_full_url,
-        compat_mode: formForSubmit.compat_mode,
+        compat_mode: submittedCompatMode,
         upstream_model: resolvedGatewayUpstreamModel,
         model_map: resolvedDesktopModelMap,
         provider_model_map: resolvedProviderModelMap,
@@ -1863,7 +1837,7 @@ function App() {
           `${targetDisplayName(target)} 配置已更新，重启 ${targetDisplayName(target)} 后生效。`,
         );
       } catch (error) {
-        showStatus(`重新应用失败：${String(error)}`, "error");
+        showStatus(`刷新失败：${String(error)}`, "error");
       } finally {
         setBusy(false);
       }
@@ -2266,10 +2240,6 @@ function App() {
     );
   }
 
-  function renderGatewayRequirementIcon(requirement: GatewayRequirement) {
-    return <GatewayRequirementIcon requirement={requirement} language={language} />;
-  }
-
   function renderModelDiscoveryField(label = "上游模型") {
     if (isOfficialCodexDirect || isAnthropicPackageDirect || isOfficialAnthropicDirect) return null;
     return (
@@ -2529,8 +2499,6 @@ function App() {
   } as CSSProperties & { "--settings-popover-left": string; "--settings-popover-bottom": string };
   const appClassName = [
     "ccr-app",
-    sidebarCollapsed ? "sidebar-collapsed" : "",
-    !sidebarCollapsed && sidebarWidth <= SIDEBAR_TEXT_ONLY_WIDTH ? "sidebar-text-only" : "",
   ].filter(Boolean).join(" ");
 
   return (
@@ -2548,16 +2516,12 @@ function App() {
         onLanguageChange={setLanguage}
         onSettingsBackdropClick={() => setSettingsPopoverOpen(false)}
         onSettingsToggle={toggleSettingsPopover}
-        onSidebarResizePointerDown={handleSidebarResizePointerDown}
-        onSidebarToggle={toggleSidebarCollapsed}
         onTargetSelect={switchTargetFromSidebar}
         onUpdateClick={openAppUpdateRelease}
         onWindowDrag={startWindowDrag}
         settingsButtonRef={settingsButtonRef}
         settingsPopoverOpen={settingsPopoverOpen}
         settingsPopoverStyle={settingsPopoverStyle}
-        sidebarCollapsed={sidebarCollapsed}
-        sidebarWidth={sidebarWidth}
         target={target}
         view={view}
       />
@@ -2594,6 +2558,7 @@ function App() {
               </div>
             </header>
 
+            <div className="ccr-add-content">
             {isEditingProfile && currentSelectedPreset ? (
               <section className="ccr-presets-section">
                 <div className="ccr-presets-label">当前厂商</div>
@@ -3170,6 +3135,7 @@ function App() {
                 </Button>
               </div>
             </section>
+            </div>
           </div>
         ) : view === "overview" ? (
 
@@ -3236,7 +3202,7 @@ function App() {
                         onClick={() => applyProfile(profile.id, opt.key)}
                         disabled={!supportsNativeApply(opt.key)}
                         type="button"
-                        title={isApplied ? "重新应用：将配置重新写入磁盘" : ""}
+                        title={isApplied ? "刷新：重新写入配置" : ""}
                       >
                         <span className="ccr-switch-item-name">{profile.display_name}</span>
                         <span className="ccr-switch-item-url">{"model" in profile ? profile.model : profile.base_url}</span>
@@ -4028,18 +3994,8 @@ function App() {
                 const isApplied = state?.applied[target] === profile.id;
                 const isEditing = false;
                 const profilePreset = presetForProfile(profile);
-                const profileGatewayRequirement = isProxyTarget(target)
-	                  ? gatewayRequirementForProfile(target, profile as CodexProfile | GatewayProfile, profilePreset)
-                  : null;
-                const profileGatewaySnapshot = isProxyTarget(target) ? getGatewaySnapshotForApp(target) : null;
-                const showProfileGatewayToggle = Boolean(profileGatewayRequirement && profileGatewayRequirement.level !== "none");
-                const profileGatewayRunning = Boolean(isApplied && profileGatewaySnapshot?.running);
-                const profileGatewayToggleDisabled = busy || codexProxyBusy || !isApplied;
-                const profileGatewayToggleTitle = !isApplied
-                  ? "请先应用此配置，再开启兼容网关。"
-                  : profileGatewayRunning
-                    ? "关闭当前配置的兼容网关"
-                    : "开启当前配置的兼容网关";
+                const profileStatusLabel = profileRouteStatusLabel(profile);
+                const modelName = profileModelName(profile);
                 const gp = profile as GatewayProfile;
 
               return (
@@ -4061,36 +4017,17 @@ function App() {
                       <div className="ccr-config-copy">
                         <div className="ccr-config-primary">
                           <span className="ccr-config-name">{profile.display_name || "未命名厂商"}</span>
-                          {(() => {
-                            const modelName = profileModelName(profile);
-                            return modelName ? (
-                              <span className="ccr-config-model-badge" title={modelName}>
-                                {modelName}
-                              </span>
-                            ) : null;
-                          })()}
+                        </div>
+                        <span className="ccr-config-meta">
+                          <span className="ccr-config-meta-text">{profileStatusLabel}</span>
+                          {modelName ? (
+                            <span className="ccr-config-model-badge" title={modelName}>
+                              {modelName}
+                            </span>
+                          ) : null}
                           {isApplied ? (
                             <span className="ccr-config-applied-badge" aria-label="已应用" title="已应用">
                               <AppliedStatusCheckIcon weight="fill" />
-                            </span>
-                          ) : null}
-                        </div>
-                        <span className="ccr-config-meta">
-                          <span className="ccr-config-meta-text">{profileCompatModeMeta(profile, target)}</span>
-                          {profileGatewayRequirement ? (
-                            <span className="ccr-config-gateway-advice">
-                              {showProfileGatewayToggle ? (
-                                <Switch
-                                  aria-label={profileGatewayToggleTitle}
-                                  className="ccr-config-gateway-toggle"
-                                  disabled={profileGatewayToggleDisabled}
-                                  isSelected={profileGatewayRunning}
-                                  onChange={(checked) => void toggleProfileGateway(profile.id, checked)}
-                                  size="sm"
-                                  title={profileGatewayToggleTitle}
-                                />
-                              ) : null}
-                              {renderGatewayRequirementIcon(profileGatewayRequirement)}
                             </span>
                           ) : null}
                         </span>
@@ -4118,10 +4055,10 @@ function App() {
 		                          className="ccr-config-compact-action"
 		                          onPress={() => applyProfile(profile.id)}
 		                          isDisabled={busy}
-		                          title="重新写入磁盘配置，修复状态不一致"
+		                          title="重新写入配置，修复状态不一致"
 		                        >
 		                          <RefreshCwIcon className="h-3.5 w-3.5" />
-		                          <span>重新应用</span>
+		                          <span>刷新</span>
 	                        </Button>
 	                      )}
 	                      <Button

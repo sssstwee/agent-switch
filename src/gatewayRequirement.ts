@@ -76,7 +76,22 @@ function isDeepSeekAnthropicProfile(profile: GatewayProfile) {
     && profile.base_url.trim().toLowerCase().includes("api.deepseek.com");
 }
 
-function vendorCapabilityKind(profile: CodexProfile | GatewayProfile, preset?: VendorPreset | null) {
+type VendorCapabilityKind =
+  | "openai"
+  | "anthropic"
+  | "deepseek"
+  | "minimax"
+  | "bailian"
+  | "kimi-code"
+  | "kimi"
+  | "siliconflow"
+  | "zai"
+  | "openrouter"
+  | "google"
+  | "modelscope"
+  | "generic";
+
+function vendorCapabilityKind(profile: CodexProfile | GatewayProfile, preset?: VendorPreset | null): VendorCapabilityKind {
   const presetId = preset?.id ?? "";
   const baseUrl = profile.base_url.trim().toLowerCase();
   const model = "model" in profile
@@ -87,9 +102,9 @@ function vendorCapabilityKind(profile: CodexProfile | GatewayProfile, preset?: V
 
   if (presetId === "openai" || presetId === "openai-package" || isOfficialOpenAiBaseUrl(profile.base_url)) return "openai";
   if (presetId === "anthropic" || isOfficialAnthropicBaseUrl(profile.base_url)) return "anthropic";
-  if (source.includes("deepseek") || baseUrl.includes("api.deepseek.com")) return "deepseek";
-  if (source.includes("minimax") || baseUrl.includes("minimax")) return "minimax";
-  if (source.includes("bailian") || source.includes("dashscope") || source.includes("aliyuncs.com")) return "bailian";
+  if (presetId.includes("bailian") || displayName.includes("阿里百炼") || baseUrl.includes("dashscope") || baseUrl.includes("aliyuncs.com")) return "bailian";
+  if (presetId.includes("minimax") || displayName.includes("minimax") || baseUrl.includes("minimax")) return "minimax";
+  if (presetId.includes("deepseek") || displayName.includes("deepseek") || baseUrl.includes("api.deepseek.com")) return "deepseek";
   if (source.includes("kimi-code") || baseUrl.includes("api.kimi.com/coding")) return "kimi-code";
   if (source.includes("kimi") || source.includes("moonshot")) return "kimi";
   if (source.includes("siliconflow")) return "siliconflow";
@@ -98,6 +113,46 @@ function vendorCapabilityKind(profile: CodexProfile | GatewayProfile, preset?: V
   if (source.includes("google") || source.includes("gemini") || baseUrl.includes("generativelanguage.googleapis.com")) return "google";
   if (source.includes("modelscope")) return "modelscope";
   return "generic";
+}
+
+function isVerifiedClaudeAnthropicDirectKind(target: TargetKey, kind: VendorCapabilityKind) {
+  if (target === "claude_desktop") {
+    return kind === "deepseek";
+  }
+  return false;
+}
+
+function isBlockedClaudeAnthropicDirectKind(target: TargetKey, kind: VendorCapabilityKind) {
+  if (target === "claude_cli") {
+    return kind === "deepseek" || kind === "minimax" || kind === "bailian";
+  }
+  return target === "claude_desktop" && kind === "bailian";
+}
+
+function isVerifiedClaudeAnthropicDirectProfile(
+  target: TargetKey,
+  profile: CodexProfile | GatewayProfile,
+  preset?: VendorPreset | null,
+) {
+  if ((target !== "claude_cli" && target !== "claude_desktop") || isCodexProfile(profile)) {
+    return false;
+  }
+  return profile.api_format === "anthropic"
+    && !isOfficialAnthropicBaseUrl(profile.base_url)
+    && isVerifiedClaudeAnthropicDirectKind(target, vendorCapabilityKind(profile, preset));
+}
+
+function isBlockedClaudeAnthropicDirectProfile(
+  target: TargetKey,
+  profile: CodexProfile | GatewayProfile,
+  preset?: VendorPreset | null,
+) {
+  if ((target !== "claude_cli" && target !== "claude_desktop") || isCodexProfile(profile)) {
+    return false;
+  }
+  return profile.api_format === "anthropic"
+    && !isOfficialAnthropicBaseUrl(profile.base_url)
+    && isBlockedClaudeAnthropicDirectKind(target, vendorCapabilityKind(profile, preset));
 }
 
 function gatewayCapabilityLimitation(target: TargetKey, profile: CodexProfile | GatewayProfile, preset?: VendorPreset | null) {
@@ -188,6 +243,8 @@ export function profileRequiresGateway(target: TargetKey, profile: CodexProfile 
     return isCodexProfile(profile) && isCodexLocalGatewayProfile(profile);
   }
   if (isCodexProfile(profile)) return false;
+  if (isVerifiedClaudeAnthropicDirectProfile(target, profile)) return false;
+  if (isBlockedClaudeAnthropicDirectProfile(target, profile)) return true;
   if (target === "claude_cli") {
     return profile.api_format === "openai_chat" || profile.api_format === "openai_responses";
   }
@@ -198,7 +255,10 @@ export function profileCanBenefitFromGateway(target: TargetKey, profile: CodexPr
   if (target === "codex" && isCodexProfile(profile) && !profileRequiresGateway(target, profile)) {
     return isCodexThirdPartyDirectProfile(profile);
   }
-  if (target !== "claude_cli" || isCodexProfile(profile) || profileRequiresGateway(target, profile)) {
+  if ((target !== "claude_cli" && target !== "claude_desktop") || isCodexProfile(profile) || profileRequiresGateway(target, profile)) {
+    return false;
+  }
+  if (isVerifiedClaudeAnthropicDirectProfile(target, profile)) {
     return false;
   }
   return profile.api_format === "anthropic" && !isOfficialAnthropicBaseUrl(profile.base_url);
@@ -215,6 +275,12 @@ function requiredGatewayDetail(target: TargetKey, profile: CodexProfile | Gatewa
   if (!isCodexProfile(profile)) {
     if (profile.api_format === "openai_chat" || profile.api_format === "openai_responses") {
       return "当前问题：Claude 客户端发送 Claude 兼容请求，但当前上游不能直接接收该请求，绕过本地网关会协议不匹配。开启收益：Switch++ 负责协议适配、模型映射、认证隔离和调用记录。";
+    }
+    if (target === "claude_desktop" && isBlockedClaudeAnthropicDirectProfile(target, profile)) {
+      return "当前问题：该厂商在 Claude Desktop 直连场景实测不可用，需要通过 Switch++ 本地网关完成模型映射、请求预检和兼容处理。";
+    }
+    if (target === "claude_cli" && isBlockedClaudeAnthropicDirectProfile(target, profile)) {
+      return "当前问题：最新版 Claude Code 直连该厂商 Anthropic 兼容端点实测失败，需要通过 Switch++ 本地网关完成模型映射、请求清洗、工具 schema 压缩和兼容转发。";
     }
     if (target === "claude_desktop" && !isOfficialAnthropicBaseUrl(profile.base_url)) {
       return "当前问题：Claude Desktop 使用 Claude 官方模型名，第三方 Anthropic 上游不经过本地网关时模型映射不可控，可能落到默认模型或失败。开启收益：Switch++ 接管模型别名映射、请求预检、调用记录和工具 schema 压缩。";
@@ -238,6 +304,9 @@ function recommendedGatewayDetail(target: TargetKey, profile: CodexProfile | Gat
     }
     return "当前问题：上游已支持 Anthropic Messages，Claude Code 可以直接连接厂商，但不经过本地网关会缺少模型别名、调用记录、请求预检和工具 schema 压缩。开启收益：本地网关保留原生协议能力，同时降低模型跑偏与 Prompt 过长风险。";
   }
+  if (target === "claude_desktop" && !isCodexProfile(profile)) {
+    return "当前问题：Claude Desktop 可以直连支持 Anthropic Messages 的厂商，但不经过本地网关会缺少模型别名、调用记录、请求预检和工具 schema 压缩。开启收益：Switch++ 可接管模型映射与诊断；关闭后会写回厂商直连地址。";
+  }
 
   return gatewayRequirement("recommended").detail;
 }
@@ -256,6 +325,10 @@ function directGatewayDetail(target: TargetKey, profile: CodexProfile | GatewayP
 
   if (!isCodexProfile(profile) && isOfficialAnthropicBaseUrl(profile.base_url)) {
     return "Anthropic 官方服务使用原生 Messages 地址，不需要 Switch++ 本地网关。";
+  }
+
+  if (isVerifiedClaudeAnthropicDirectProfile(target, profile)) {
+    return "该厂商 Anthropic 兼容端点已实测可由 Claude 直连使用，不需要开启 Switch++ 本地网关；需要调用记录、模型映射或请求清洗时再开启网关。";
   }
 
   return gatewayRequirement("none").detail;
@@ -301,7 +374,13 @@ export function gatewayRequirementForTarget(
       gatewayCapabilityLimitation(target, appliedProfile, appliedPreset),
     );
   }
-  if (profiles.some((profile) => profileRequiresGateway(target, profile) || profileCanBenefitFromGateway(target, profile))) {
+  const otherProfiles = appliedProfile
+    ? profiles.filter((profile) => profile.id !== appliedProfile.id)
+    : profiles;
+  const shouldRecommendFromOtherProfiles = appliedProfile
+    ? otherProfiles.some((profile) => profileCanBenefitFromGateway(target, profile))
+    : otherProfiles.some((profile) => profileRequiresGateway(target, profile) || profileCanBenefitFromGateway(target, profile));
+  if (shouldRecommendFromOtherProfiles) {
     return withGatewayRequirementDetail(
       "recommended",
       "已添加配置中存在可使用或依赖本地网关的项目；建议在切换前确认网关状态。",

@@ -107,14 +107,18 @@ export function resolveGatewayFormCompatMode(
 }
 
 export function gatewayProfileUsesProxy(profile: GatewayProfile) {
-  return profile.compat_mode === "proxy"
+  if (profile.api_format === "anthropic" && !isOfficialAnthropicBaseUrl(profile.base_url)) return true;
+  const compatMode = profile.compat_mode ?? (isOfficialAnthropicBaseUrl(profile.base_url) ? "direct" : "proxy");
+  return compatMode === "proxy"
     || profile.api_format === "openai_chat"
-    || profile.api_format === "openai_responses"
-    || !isOfficialAnthropicBaseUrl(profile.base_url);
+    || profile.api_format === "openai_responses";
 }
 
 export function gatewayProfileUsesProxyForTarget(profile: GatewayProfile, target: TargetKey) {
   if (target === "claude_cli") {
+    return gatewayProfileUsesProxy(profile);
+  }
+  if (target === "claude_desktop") {
     return profile.compat_mode === "proxy"
       || profile.api_format === "openai_chat"
       || profile.api_format === "openai_responses";

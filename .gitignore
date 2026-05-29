@@ -50,3 +50,4 @@ docs/superpowers/
 # Build artifacts & generated files
 src-tauri/target/
 src-tauri/gen/
+.codegraph/

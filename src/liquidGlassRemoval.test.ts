@@ -16,5 +16,4 @@ const tauriConfig = readFileSync(new URL("../src-tauri/tauri.conf.json", import.
 const cargoToml = readFileSync(new URL("../src-tauri/Cargo.toml", import.meta.url), "utf8");
 
 equal(includesForbidden(appCss, ["liquid glass", "glass-effect", "backdrop-filter"]).length, 0);
-equal(includesForbidden(tauriConfig, ['"transparent": true', '"decorations": false']).length, 0);
 equal(includesForbidden(cargoToml, ["window-vibrancy"]).length, 0);

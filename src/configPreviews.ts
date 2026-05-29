@@ -15,7 +15,7 @@ import {
   type CodexConfigOptions,
 } from "./codexConfig.ts";
 import { sanitizeClaudeConfigOptionsForStableExperience } from "./gatewayConfigOptions.ts";
-import { isAsciiHeaderValue, isOfficialAnthropicBaseUrl, modelSupports1mContext } from "./gatewayProfile.ts";
+import { isAsciiHeaderValue, modelSupports1mContext } from "./gatewayProfile.ts";
 import { claudeOfficialModelMap } from "./vendorPresets.ts";
 
 // Re-export for backward compatibility — consumers should prefer appConstants.ts directly.
@@ -47,9 +47,6 @@ export function localClaudeProxyBaseUrlForTarget(target: TargetKey) {
 function gatewayFormRequiresLocalProxy(form: AddForm, target: TargetKey = "claude_cli") {
   const protocolRequiresProxy = form.api_format === "openai_chat" || form.api_format === "openai_responses";
   if (target === "claude_cli") return form.compat_mode === "proxy" || protocolRequiresProxy;
-  if (target === "claude_desktop") {
-    return form.compat_mode === "proxy" || protocolRequiresProxy || !isOfficialAnthropicBaseUrl(form.base_url);
-  }
   return form.compat_mode === "proxy" || protocolRequiresProxy;
 }
 
@@ -722,10 +719,14 @@ export function buildTargetConfigPreview(form: AddForm, target: TargetKey = "cla
   return buildGatewayConfigPreview(form, target);
 }
 
-function withClaudeCode1mSuffix(model: string, supports1mContextOverride?: boolean) {
+function claudeCodeAllows1mSuffix(baseUrl: string) {
+  return !baseUrl.trim().toLowerCase().includes("dashscope.aliyuncs.com");
+}
+
+function withClaudeCode1mSuffix(model: string, supports1mContextOverride: boolean | undefined, baseUrl: string) {
   const trimmed = model.trim();
   const supports1mContext = supports1mContextOverride ?? modelSupports1mContext(trimmed);
-  if (!trimmed || !supports1mContext || /\[1m]$/i.test(trimmed)) return trimmed;
+  if (!trimmed || !claudeCodeAllows1mSuffix(baseUrl) || !supports1mContext || /\[1m]$/i.test(trimmed)) return trimmed;
   return `${trimmed}[1m]`;
 }
 
@@ -733,9 +734,10 @@ function claudeCodeModelEnvValue(
   model: string,
   alias: "main" | "opus" | "sonnet" | "haiku",
   supports1mContextOverride?: boolean,
+  baseUrl = "",
 ) {
   if (alias === "haiku") return model;
-  return withClaudeCode1mSuffix(model, supports1mContextOverride);
+  return withClaudeCode1mSuffix(model, supports1mContextOverride, baseUrl);
 }
 
 export function buildGatewayConfigPreview(form: AddForm, target: TargetKey = "claude_cli") {
@@ -744,10 +746,10 @@ export function buildGatewayConfigPreview(form: AddForm, target: TargetKey = "cl
     : form.config_options;
   const modelMap = target === "claude_cli"
     ? {
-      main: claudeCodeModelEnvValue(form.model_map.main, "main", form.supports_1m_context),
-      opus: claudeCodeModelEnvValue(form.model_map.opus, "opus", form.supports_1m_context),
-      sonnet: claudeCodeModelEnvValue(form.model_map.sonnet, "sonnet", form.supports_1m_context),
-      haiku: claudeCodeModelEnvValue(form.model_map.haiku, "haiku", form.supports_1m_context),
+      main: claudeCodeModelEnvValue(form.model_map.main, "main", form.supports_1m_context, form.base_url),
+      opus: claudeCodeModelEnvValue(form.model_map.opus, "opus", form.supports_1m_context, form.base_url),
+      sonnet: claudeCodeModelEnvValue(form.model_map.sonnet, "sonnet", form.supports_1m_context, form.base_url),
+      haiku: claudeCodeModelEnvValue(form.model_map.haiku, "haiku", form.supports_1m_context, form.base_url),
     }
     : form.model_map;
   const env: Record<string, string> = {

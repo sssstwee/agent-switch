@@ -1,6 +1,7 @@
+import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { useEffect, useRef, useState, type MouseEvent, type PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import {
   APP_UPDATE_INITIAL_CHECK_DELAY_MS,
   APP_UPDATE_POLL_INTERVAL_MS,
@@ -14,13 +15,9 @@ import {
   APP_RELEASES_URL,
   DEV_MOCK_APP_UPDATE_STORAGE_KEY,
   LEGACY_DEV_MOCK_APP_UPDATE_STORAGE_KEYS,
-  SIDEBAR_COLLAPSE_WIDTH,
-  SIDEBAR_EXPANDED_MIN_WIDTH,
-  SIDEBAR_TEXT_ONLY_WIDTH,
 } from "../../appConstants.ts";
 import type { AppUpdateCheckResult } from "../../appTypes.ts";
 import { invokeNative, nativeCommand } from "../../nativeIpc.ts";
-import { clampSidebarWidth } from "../../sidebarUtils.ts";
 
 type StateUpdater<T> = T | ((current: T) => T);
 
@@ -30,10 +27,6 @@ type SettingsPopoverAnchor = {
 };
 
 type UseAppShellChromeOptions = {
-  sidebarCollapsed: boolean;
-  sidebarWidth: number;
-  setSidebarCollapsed: (value: StateUpdater<boolean>) => void;
-  setSidebarWidth: (value: StateUpdater<number>) => void;
   setSettingsPopoverOpen: (value: StateUpdater<boolean>) => void;
   setSettingsPopoverAnchor: (value: SettingsPopoverAnchor) => void;
   showStatus: (message: string, type?: "success" | "error" | "") => void;
@@ -65,10 +58,6 @@ function currentDocumentVisibility(): DocumentVisibilityState | "unknown" {
 }
 
 export function useAppShellChrome({
-  sidebarCollapsed,
-  sidebarWidth,
-  setSidebarCollapsed,
-  setSidebarWidth,
   setSettingsPopoverOpen,
   setSettingsPopoverAnchor,
   showStatus,
@@ -79,44 +68,15 @@ export function useAppShellChrome({
   const appUpdateCheckingRef = useRef(false);
   const lastEventAppUpdateCheckAtRef = useRef<number | null>(null);
 
-  function handleSidebarResizePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
-    if (sidebarCollapsed) return;
-    event.preventDefault();
-    const startX = event.clientX;
-    const startWidth = sidebarWidth;
-
-    function updateSidebarWidth(pointerEvent: PointerEvent) {
-      const nextWidth = clampSidebarWidth(startWidth + pointerEvent.clientX - startX);
-      if (nextWidth <= SIDEBAR_COLLAPSE_WIDTH) {
-        setSidebarWidth(SIDEBAR_TEXT_ONLY_WIDTH);
-        setSidebarCollapsed(true);
-        stopSidebarResize();
-        return;
-      }
-      setSidebarWidth(nextWidth);
+  useEffect(() => {
+    try {
+      void getCurrentWebviewWindow().setBackgroundColor([0, 0, 0, 0]).catch(() => {
+        // The Vite-only browser preview does not provide a Tauri window handle.
+      });
+    } catch {
+      // The Vite-only browser preview does not provide a Tauri window handle.
     }
-
-    function stopSidebarResize() {
-      document.documentElement.classList.remove("ccr-sidebar-resizing");
-      window.removeEventListener("pointermove", updateSidebarWidth);
-      window.removeEventListener("pointerup", stopSidebarResize);
-      window.removeEventListener("pointercancel", stopSidebarResize);
-    }
-
-    document.documentElement.classList.add("ccr-sidebar-resizing");
-    window.addEventListener("pointermove", updateSidebarWidth);
-    window.addEventListener("pointerup", stopSidebarResize);
-    window.addEventListener("pointercancel", stopSidebarResize);
-  }
-
-  function toggleSidebarCollapsed() {
-    setSidebarCollapsed((collapsed) => {
-      if (collapsed) {
-        setSidebarWidth((width) => Math.max(width, SIDEBAR_EXPANDED_MIN_WIDTH));
-      }
-      return !collapsed;
-    });
-  }
+  }, []);
 
   function toggleSettingsPopover() {
     const rect = settingsButtonRef.current?.getBoundingClientRect();
@@ -227,12 +187,10 @@ export function useAppShellChrome({
 
   return {
     appUpdate,
-    handleSidebarResizePointerDown,
     openAppUpdateRelease,
     runAppUpdateCheck,
     settingsButtonRef,
     startWindowDrag,
     toggleSettingsPopover,
-    toggleSidebarCollapsed,
   };
 }
