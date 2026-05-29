@@ -13,6 +13,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Checkout private core
+        uses: actions/checkout@v4
+        with:
+          repository: sssstwee/agent-switch-private-core
+          token: ${{ secrets.AGENT_SWITCH_PRIVATE_CORE_TOKEN }}
+          path: .private/agent-switch-private-core
+
       - uses: pnpm/action-setup@v4
         with:
           version: 9
@@ -35,6 +42,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libssl-dev \
+            libgtk-3-dev \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf
 
       - uses: dtolnay/rust-toolchain@stable
         with:
