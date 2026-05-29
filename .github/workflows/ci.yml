@@ -43,6 +43,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Checkout private core
+        uses: actions/checkout@v4
+        with:
+          repository: sssstwee/agent-switch-private-core
+          token: ${{ secrets.AGENT_SWITCH_PRIVATE_CORE_TOKEN }}
+          path: .private/agent-switch-private-core
+
       - name: Install Linux dependencies
         run: |
           sudo apt-get update
