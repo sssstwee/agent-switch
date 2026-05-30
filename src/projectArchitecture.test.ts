@@ -45,6 +45,7 @@ test("public branding uses Switch++ naming", () => {
   const cargoToml = readSource("../src-tauri/Cargo.toml");
   const indexHtml = readSource("../index.html");
   const readme = readSource("../README.md");
+  const readmeEn = readSource("../README.en.md");
   const docs = readSource("../docs/index.html");
   const appConstants = readSource("./appConstants.ts");
 
@@ -69,21 +70,27 @@ test("public branding uses Switch++ naming", () => {
   assert.equal(indexHtml.includes("<title>Switch++</title>"), true);
   assert.equal(indexHtml.includes("/switchpp-logo.png"), true);
   assert.equal(readme.includes("https://github.com/sssstwee/switch-plus-plus/releases/latest"), true);
+  assert.equal(readmeEn.includes("https://github.com/sssstwee/switch-plus-plus/releases/latest"), true);
   assert.equal(docs.includes("https://github.com/sssstwee/switch-plus-plus/releases/latest"), true);
   assert.equal(docs.includes("third-party config switcher"), true);
   assert.equal(readme.includes("Switch++"), true);
+  assert.equal(readmeEn.includes("Switch++"), true);
   assert.equal(readme.includes("Switch++ -"), false);
+  assert.equal(readmeEn.includes("Switch++ -"), false);
   assert.equal(tauriConfig.app.windows[0].title.includes("Switch++ -"), false);
   assert.equal(docs.includes("Switch++ 下载与使用指南"), true);
   assert.equal(readme.includes("Code3P"), false);
+  assert.equal(readmeEn.includes("Code3P"), false);
   assert.equal(docs.includes("Code3P"), false);
   assert.equal(readme.includes("CC3P"), false);
+  assert.equal(readmeEn.includes("CC3P"), false);
   assert.equal(docs.includes("CC3P"), false);
 });
 
 test("public docs and release metadata do not advertise legacy repository names", () => {
   const publicSurfaceFiles = [
     "../README.md",
+    "../README.en.md",
     "../docs/index.html",
     "../index.html",
     "../package.json",
