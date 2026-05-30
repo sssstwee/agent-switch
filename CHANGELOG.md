@@ -2,40 +2,33 @@
 
 ## v1.0.2 - 2026-05-30
 
-Switch++ 小版本更新。本次重点打磨桌面端外观、窗口比例、侧栏密度、滚动体验和细节动效，让应用更像一个紧凑、原生、可长期停留在桌面的工具。
+Switch++ 小版本更新。本次重点解决 Claude Code 三方模型接入、兼容网关判断、菜单栏图标和本地化文案中的实际问题，让配置写入后更容易判断“是否需要网关、为什么失败、该如何验证”。
 
-### 功能亮点 / Highlights
+### 修复与改进 / Fixes & Improvements
 
-- 重新校准默认窗口尺寸为 `936x655`，保持约 `1.43` 的宽高比，并限制最小尺寸，避免工具窗口被缩到不可用状态。
-- 将左侧侧栏固定为窗口宽度的 25%，在默认尺寸下完整展示应用与工具菜单，减少默认进入时的滚动需求。
-- 优化配置列表顶部栏在最小尺寸下的收缩规则，保留右侧操作按钮单行显示，标题和描述在空间不足时自然省略。
-- 隐藏内部滚动条但保留滚动能力，让侧栏、配置列表、网关详情和配置编辑区域视觉上更干净。
-- 统一窗口、面板、卡片、按钮、菜单和弹出层的圆角 token，保持更一致的 macOS 工具应用质感。
-- 为刷新、网关启停、更多菜单、更新提示和菜单项加入克制微动效，同时遵守系统的 reduced motion 偏好。
-- 改进菜单栏图标为独立的 switch 模板图标，避免 Dock 图标和菜单栏图标混用导致显示成黑块或比例失真。
-- 修正英文模式下的短状态与动作翻译，避免出现中英混排或半翻译状态。
+- 修复 Claude Code 使用部分三方 Anthropic-compatible 端点时容易直连失败的问题：Switch++ 会识别需要本地兼容网关的配置，并提示通过本地网关完成模型映射、请求清洗、工具 schema 压缩和兼容转发。
+- 改进 Claude Code 兼容网关状态说明，不再只展示“建议/必须开启”，而是拆分说明当前问题、开启收益和仍有限制，帮助判断失败来自厂商端点、协议兼容还是本地配置。
+- 修复 Claude Code / Claude Desktop 网关启停语义，支持用户在网关页手动关闭本地兼容网关，并用 switch 开关展示当前启停状态。
+- 修复配置应用后的提示文案，去掉“写入磁盘”等偏实现细节的表述，改为描述配置已写入以及需要重启目标应用后生效。
+- 修复英文模式下的中英混排问题，包括网关状态、刷新按钮、短状态和动作文案，避免出现 `已Start` 这类半翻译状态。
+- 修复菜单栏图标显示为黑块、比例过细或与 Dock 图标混用的问题，改为独立的 switch 模板图标。
+- 修复 Windows release 打包脚本对 `PATH="$HOME/.cargo/bin:$PATH"` 的依赖，避免 Windows 构建找不到 Tauri 命令。
+- 补齐 CI 对私有核心和 Linux Tauri 依赖的检查，避免本地验证通过但主分支 CI 因缺少私有核心或系统库失败。
+- 全新 UI 升级提升视觉体验。
 
 ### 界面预览 / Screenshots
 
-**Codex Desktop 使用 DeepSeek 三方模型 / Codex Desktop with a DeepSeek third-party model**
+| Codex 配置列表 / Codex profiles |
+| --- |
+| ![Codex 配置列表](https://raw.githubusercontent.com/sssstwee/switch-plus-plus/main/docs/assets/screenshots/switchpp-codex-profiles.png) |
 
-![Codex Desktop 使用 DeepSeek 三方模型](https://raw.githubusercontent.com/sssstwee/switch-plus-plus/v1.0.2/docs/assets/screenshots/switchpp-codex-desktop-deepseek.png)
+| 兼容网关概览 / Gateway overview |
+| --- |
+| ![兼容网关概览](https://raw.githubusercontent.com/sssstwee/switch-plus-plus/main/docs/assets/screenshots/switchpp-gateway-overview.png) |
 
-| Codex 配置列表 / Codex profiles | 新增 Codex 配置 / New Codex profile |
-| --- | --- |
-| ![Codex 配置列表](https://raw.githubusercontent.com/sssstwee/switch-plus-plus/v1.0.2/docs/assets/screenshots/switchpp-codex-profiles.png) | ![新增 Codex 配置](https://raw.githubusercontent.com/sssstwee/switch-plus-plus/v1.0.2/docs/assets/screenshots/switchpp-codex-new-profile.png) |
-
-| Claude Desktop 配置切换 / Claude Desktop profiles | 本地环境检查 / Environment check |
-| --- | --- |
-| ![Claude Desktop 配置切换](https://raw.githubusercontent.com/sssstwee/switch-plus-plus/v1.0.2/docs/assets/screenshots/switchpp-claude-desktop-profiles.png) | ![本地环境检查](https://raw.githubusercontent.com/sssstwee/switch-plus-plus/v1.0.2/docs/assets/screenshots/switchpp-environment-check.png) |
-
-| 兼容网关概览 / Gateway overview | 兼容网关调用记录 / Gateway request history |
-| --- | --- |
-| ![兼容网关概览](https://raw.githubusercontent.com/sssstwee/switch-plus-plus/v1.0.2/docs/assets/screenshots/switchpp-gateway-overview.png) | ![兼容网关调用记录](https://raw.githubusercontent.com/sssstwee/switch-plus-plus/v1.0.2/docs/assets/screenshots/switchpp-gateway-requests.png) |
-
-| Claude Desktop 模型菜单 / Claude Desktop model menu | Claude Desktop 经由本地网关响应 / Claude Desktop through local gateway |
-| --- | --- |
-| ![Claude Desktop 模型菜单](https://raw.githubusercontent.com/sssstwee/switch-plus-plus/v1.0.2/docs/assets/screenshots/switchpp-claude-model-menu.png) | ![Claude Desktop 经由本地网关响应](https://raw.githubusercontent.com/sssstwee/switch-plus-plus/v1.0.2/docs/assets/screenshots/switchpp-claude-gateway-chat.png) |
+| 本地环境检查 / Environment check |
+| --- |
+| ![本地环境检查](https://raw.githubusercontent.com/sssstwee/switch-plus-plus/main/docs/assets/screenshots/switchpp-environment-check.png) |
 
 ### macOS 首次启动说明 / macOS First-Launch Notice
 
