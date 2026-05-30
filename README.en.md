@@ -1,8 +1,8 @@
-# Switch++: Third-Party Models for Claude and Codex
+# Switch++: Third-Party Models, Profile Switching, and Local Gateway for Claude Code and Codex
 
 中文版本: [README.md](README.md)
 
-Switch++ is a desktop configuration switcher, model router, and local compatibility gateway for bringing third-party models into Claude Code, Claude Desktop, Codex CLI, Codex Desktop, and common local AI coding agents.
+Switch++ is a desktop configuration switcher, model router, and local compatibility gateway for bringing third-party models into Claude Code, Claude Desktop, Codex CLI, Codex Desktop, and common local AI coding agents. It also matches common searches such as Claude Code third-party models, Codex third-party models, Codex config switching, Claude Desktop local gateway, OpenAI-compatible proxy, and Anthropic-compatible proxy.
 
 - Downloads: https://github.com/sssstwee/switch-plus-plus/releases/latest
 - Download page and user guide: https://sssstwee.github.io/switch-plus-plus/
@@ -158,7 +158,7 @@ When no Claude Desktop target is available on the system, Switch++ skips desktop
 
 ## Search Keywords
 
-Switch++, Agent Router, model router, model switcher, LLM gateway, Claude Code third-party models, Claude Desktop, Codex third-party models, Codex CLI, Codex Desktop, Hermes, OpenCode, OpenClaw, Pi, OpenAI-compatible, Anthropic-compatible, local compatibility gateway.
+Switch++, Switch Plus Plus, switchpp, switch-plus-plus, cc3p, Claude Code third-party models, Claude Code config switching, Claude Code gateway, Claude Desktop third-party models, Codex third-party models, Codex CLI, Codex Desktop, Codex config switching, Codex local gateway, Agent Router, model router, model switcher, LLM gateway, Hermes, OpenCode, OpenClaw, Pi, DeepSeek Codex, Kimi Codex, MiniMax Claude Code, GLM Codex, OpenAI-compatible, Anthropic-compatible, local compatibility gateway.
 
 ## Copyright and License
 

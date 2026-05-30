@@ -3,16 +3,41 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Switch++ 下载与使用指南</title>
+    <title>Switch++ - Claude Code / Codex 第三方模型接入、配置切换与本地兼容网关</title>
     <meta
       name="description"
-      content="Switch++ is a Claude Code, Claude Desktop, Codex CLI, Codex Desktop, and local AI agent third-party model access console with a local OpenAI/Anthropic compatibility gateway, request diagnostics, and auditable config writes."
+      content="Switch++ 是面向 Claude Code、Claude Desktop、Codex CLI、Codex Desktop 和本地 AI 编程 Agent 的第三方模型接入工具，支持配置切换、本地 OpenAI/Anthropic 兼容网关、请求诊断和可审计配置写入。"
     />
     <meta
       name="keywords"
-      content="Switch++, Agent Router, model router, model switcher, LLM gateway, Claude Code third-party models, Claude Desktop, Codex third-party models, Codex CLI, Codex Desktop, Hermes, Hermes Agent, OpenCode, OpenClaw, Pi, Pi Coding Agent, Oh My OpenAgent, Oh My OpenCode, Oh My Pi, OpenAI, OpenAI API, Anthropic, Anthropic API, third-party config switcher, third-party config manager, AI coding agent, local compatibility gateway, OpenAI API proxy, Anthropic API proxy, OpenAI compatible, Anthropic compatible"
+      content="Switch++, Switch Plus Plus, switchpp, switch-plus-plus, cc3p, Claude Code 第三方模型, Claude Code 配置切换, Claude Code 网关, Claude Desktop 第三方模型, Codex 第三方模型, Codex CLI, Codex Desktop, Codex 配置切换, Codex 本地网关, Agent Router, model router, model switcher, LLM gateway, Claude Code third-party models, Claude Desktop, Codex third-party models, Hermes, Hermes Agent, OpenCode, OpenClaw, Pi, Pi Coding Agent, Oh My OpenAgent, Oh My OpenCode, Oh My Pi, DeepSeek Codex, Kimi Codex, MiniMax Claude Code, GLM Codex, OpenAI compatible, Anthropic compatible, OpenAI API proxy, Anthropic API proxy, third-party config switcher, third-party config manager, local compatibility gateway, AI coding agent"
     />
+    <meta name="application-name" content="Switch++" />
+    <meta property="og:title" content="Switch++ - Claude Code / Codex 第三方模型接入工具" />
+    <meta
+      property="og:description"
+      content="为 Claude Code、Claude Desktop、Codex CLI、Codex Desktop 和本地 AI 编程 Agent 管理第三方模型配置、本地兼容网关、请求诊断和可审计写入。"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://sssstwee.github.io/switch-plus-plus/" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="canonical" href="https://sssstwee.github.io/switch-plus-plus/" />
     <link rel="icon" href="data:," />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Switch++",
+        "alternateName": ["Switch Plus Plus", "switchpp", "switch-plus-plus", "cc3p"],
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": ["macOS", "Windows", "Linux"],
+        "description": "Switch++ helps Claude Code, Claude Desktop, Codex CLI, Codex Desktop, and local AI coding agents use third-party models through profile switching, local OpenAI/Anthropic compatible gateways, request diagnostics, and auditable config writes.",
+        "keywords": "Claude Code third-party models, Codex third-party models, Claude Desktop, Codex CLI, Codex Desktop, model router, model switcher, LLM gateway, OpenAI compatible, Anthropic compatible, local compatibility gateway",
+        "url": "https://sssstwee.github.io/switch-plus-plus/",
+        "downloadUrl": "https://github.com/sssstwee/switch-plus-plus/releases/latest",
+        "softwareVersion": "1.0.2"
+      }
+    </script>
     <style>
       :root {
         color-scheme: light;
@@ -296,14 +321,14 @@
           <div class="eyebrow">Switch++ 下载与使用指南</div>
           <h1>Switch++</h1>
           <p class="lead">
-            面向 Claude Code、Claude Desktop、Codex CLI、Codex Desktop 和本地 AI 编程 Agent 的三方模型接入控制台，内置本地兼容网关、请求诊断和可审计配置写入。
+            面向 Claude Code、Claude Desktop、Codex CLI、Codex Desktop 和本地 AI 编程 Agent 的三方模型接入、配置切换和模型路由控制台，内置本地 OpenAI / Anthropic 兼容网关、请求诊断和可审计配置写入。
           </p>
         </div>
         <div class="lang-block" data-lang="en">
           <div class="eyebrow">Switch++ Download and User Guide</div>
           <h1>Switch++</h1>
           <p class="lead">
-            A third-party model access console for Claude Code, Claude Desktop, Codex CLI, Codex Desktop, and local AI coding agents, with a local compatibility gateway, request diagnostics, and auditable config writes.
+            A third-party model access, profile switching, and model routing console for Claude Code, Claude Desktop, Codex CLI, Codex Desktop, and local AI coding agents, with a local OpenAI / Anthropic compatibility gateway, request diagnostics, and auditable config writes.
           </p>
         </div>
         <div class="actions">
@@ -325,6 +350,7 @@
         </h2>
         <div class="lang-block" data-lang="zh">
           <p>Switch++ 不只是一个 provider 切换器，而是面向 Claude / Codex 桌面与本地 agent 生态的三方模型接入控制台。</p>
+          <p>如果你在搜索 Claude Code 第三方模型、Codex 第三方模型、Codex 配置切换、Claude Desktop 本地网关、OpenAI-compatible 或 Anthropic-compatible 代理，Switch++ 覆盖的是同一类工作流。</p>
           <div class="value-grid">
             <div class="value-card">
               <strong>Claude Desktop 深度适配</strong>
@@ -354,6 +380,7 @@
         </div>
         <div class="lang-block" data-lang="en">
           <p>Switch++ is not just a provider switcher. It is a third-party model access console for Claude / Codex desktop workflows and local agent toolchains.</p>
+          <p>If you search for Claude Code third-party models, Codex third-party models, Codex config switching, Claude Desktop local gateways, OpenAI-compatible proxies, or Anthropic-compatible proxies, Switch++ covers that workflow.</p>
           <div class="value-grid">
             <div class="value-card">
               <strong>Claude Desktop first-class support</strong>

@@ -1,8 +1,8 @@
-# Switch++：Claude 与 Codex 的第三方模型接入工具
+# Switch++：Claude Code / Codex 第三方模型接入、配置切换与本地兼容网关
 
 English version: [README.en.md](README.en.md)
 
-Switch++ 是一个桌面端配置切换、模型路由和本地兼容网关工具，用来把第三方模型接入 Claude Code、Claude Desktop、Codex CLI、Codex Desktop 以及常见本地 AI coding agent。
+Switch++ 是一个桌面端配置切换、模型路由和本地兼容网关工具，用来把第三方模型接入 Claude Code、Claude Desktop、Codex CLI、Codex Desktop 以及常见本地 AI coding agent。也可以按 Claude Code 第三方模型、Codex 第三方模型、Codex 配置切换、Claude Desktop 本地网关、OpenAI-compatible 代理或 Anthropic-compatible 代理这类关键词理解它的使用场景。
 
 - 下载地址：https://github.com/sssstwee/switch-plus-plus/releases/latest
 - 下载页与使用指南：https://sssstwee.github.io/switch-plus-plus/
@@ -158,7 +158,7 @@ open "/Applications/Switch++.app"
 
 ## 搜索关键词
 
-Switch++, Agent Router, model router, model switcher, LLM gateway, Claude Code third-party models, Claude Desktop, Codex third-party models, Codex CLI, Codex Desktop, Hermes, OpenCode, OpenClaw, Pi, OpenAI-compatible, Anthropic-compatible, local compatibility gateway.
+Switch++, Switch Plus Plus, switchpp, switch-plus-plus, cc3p, Claude Code 第三方模型, Claude Code 配置切换, Claude Code 网关, Claude Desktop 第三方模型, Codex 第三方模型, Codex CLI, Codex Desktop, Codex 配置切换, Codex 本地网关, Agent Router, model router, model switcher, LLM gateway, Claude Code third-party models, Claude Desktop, Codex third-party models, Hermes, OpenCode, OpenClaw, Pi, DeepSeek Codex, Kimi Codex, MiniMax Claude Code, GLM Codex, OpenAI-compatible, Anthropic-compatible, local compatibility gateway.
 
 ## 版权与许可
 
