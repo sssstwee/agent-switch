@@ -46,25 +46,29 @@ Switch++ 不只是一个 provider 切换器，而是面向 Claude / Codex 桌面
 
 ### 界面预览 / Screenshots
 
-**Codex Desktop 使用 DeepSeek 三方模型 / Codex Desktop with a DeepSeek third-party model**
+**Codex 配置列表 / Codex profiles**
 
-![Codex Desktop 使用 DeepSeek 三方模型](docs/assets/screenshots/switchpp-codex-desktop-deepseek.png)
+![Codex 配置列表](docs/assets/screenshots/switchpp-codex-profiles.png)
 
-| Codex 配置列表 / Codex profiles | 新增 Codex 配置 / New Codex profile |
-| --- | --- |
-| ![Codex 配置列表](docs/assets/screenshots/switchpp-codex-profiles.png) | ![新增 Codex 配置](docs/assets/screenshots/switchpp-codex-new-profile.png) |
+**新增 Codex 配置 / New Codex profile**
 
-| Claude Desktop 配置切换 / Claude Desktop profiles | 本地环境检查 / Environment check |
-| --- | --- |
-| ![Claude Desktop 配置切换](docs/assets/screenshots/switchpp-claude-desktop-profiles.png) | ![本地环境检查](docs/assets/screenshots/switchpp-environment-check.png) |
+![新增 Codex 配置](docs/assets/screenshots/switchpp-codex-new-profile.png)
 
-| 兼容网关概览 / Gateway overview | 兼容网关调用记录 / Gateway request history |
-| --- | --- |
-| ![兼容网关概览](docs/assets/screenshots/switchpp-gateway-overview.png) | ![兼容网关调用记录](docs/assets/screenshots/switchpp-gateway-requests.png) |
+**Claude Code 配置列表 / Claude Code profiles**
 
-| Claude Desktop 模型菜单 / Claude Desktop model menu | Claude Desktop 经由本地网关响应 / Claude Desktop through local gateway |
-| --- | --- |
-| ![Claude Desktop 模型菜单](docs/assets/screenshots/switchpp-claude-model-menu.png) | ![Claude Desktop 经由本地网关响应](docs/assets/screenshots/switchpp-claude-gateway-chat.png) |
+![Claude Code 配置列表](docs/assets/screenshots/switchpp-claude-code-profiles.png)
+
+**兼容网关概览 / Gateway overview**
+
+![兼容网关概览](docs/assets/screenshots/switchpp-gateway-overview.png)
+
+**兼容网关调用记录 / Gateway request history**
+
+![兼容网关调用记录](docs/assets/screenshots/switchpp-gateway-requests.png)
+
+**本地环境检查 / Environment check**
+
+![本地环境检查](docs/assets/screenshots/switchpp-environment-check.png)
 
 ### 适用场景
 
